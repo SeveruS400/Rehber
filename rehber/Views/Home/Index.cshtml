@@ -1,0 +1,70 @@
+﻿@model List<QuestionResponseStatisticsViewModel>
+@{
+    var selectedSurveyId = ViewBag.SelectedSurveyId;
+    var yesNoSurveys = ViewBag.YesNoSurveys as List<SelectListItem> ?? new List<SelectListItem>();
+}
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Users> UserManager
+@inject SignInManager<Users> SignInManager
+
+@{
+    var isAuthenticated = SignInManager.IsSignedIn(User);
+    var user = UserManager.GetUserAsync(User).Result; // Kullanıcıyı alıyoruz
+    var isAdmin = false;
+
+    if (user != null)
+    {
+        var roles = UserManager.GetRolesAsync(user).Result; // Kullanıcının rollerini alıyoruz
+        isAdmin = roles.Contains("Admin");
+    }
+}
+
+@if(user != null)
+{
+    <h1>@user.UserName </h1>
+}
+
+
+<form method="get" asp-action="Index">
+    <div class="mb-3">
+        <label for="surveySelect" class="form-label">Anket</label>
+        <select class="form-select" id="surveySelect" name="selectedSurveyId">
+            <option selected disabled>Bir anket seçin...</option>
+            @foreach (var survey in yesNoSurveys)
+            {
+                <option value="@survey.Value" selected=@(survey.Value == selectedSurveyId.ToString() ? "selected=\"selected\"" : "")>
+                @survey.Text
+                </option>
+               
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Sonuçları Gör</button>
+</form>
+
+<div class="container mt-5">
+    @foreach (var question in Model)
+    {
+        <div class="mb-4">
+            <h5>@question.QuestionText</h5>
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: @question.YesPercentage%;" aria-valuenow="@question.YesPercentage" aria-valuemin="0" aria-valuemax="100">
+                    Evet: @question.YesPercentage.ToString("F1")%
+                </div>
+                <div class="progress-bar bg-danger" role="progressbar" style="width: @question.NoPercentage%;" aria-valuenow="@question.NoPercentage" aria-valuemin="0" aria-valuemax="100">
+                    Hayır: @question.NoPercentage.ToString("F1")%
+                </div>
+            </div>
+            <p>Evet Sayısı: @question.YesCount, Hayır Sayısı: @question.NoCount</p>
+        </div>
+    }
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectedSurveyId = "@selectedSurveyId";
+        const surveySelect = document.getElementById('surveySelect');
+        if (surveySelect) {
+            surveySelect.value = selectedSurveyId;
+        }
+    });
+</script>

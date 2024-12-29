@@ -1,0 +1,302 @@
+﻿@model ProductViewModel
+@{
+    
+    var categoryName = Model.Categories
+        .FirstOrDefault(c => c.Id == @Model.Product.CategoryId)?.CategoryName ?? "N/A";
+    var educationStatusName = Model.EducationStatus
+        .FirstOrDefault(c => c.Id == @Model.Product.EducationStatusId)?.EducationStatusName ?? "N/A";
+    var referanceName = Model.Referance
+        .FirstOrDefault(c => c.Id == @Model.Product.ReferanceId)?.ReferanceName ?? "N/A";
+
+}
+<style>
+    body {
+        margin-top: 20px;
+        color: #1a202c;
+        text-align: left;
+        background-color: #e2e8f0;
+    }
+
+    .table-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .table-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .main-body {
+        padding: 15px;
+    }
+
+    .card {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: .16rem;
+    }
+
+    .card-body {
+        flex: 1 1 auto;
+        min-height: 1px;
+        padding: 1rem;
+        font-size: 20px;
+    }
+
+    .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+
+    }
+
+        .gutters-sm > .col, .gutters-sm > [class*=col-] {
+            padding-right: 8px;
+            padding-left: 8px;
+            width: 30%;
+        }
+
+    .mb-3, .my-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .bg-gray-300 {
+        background-color: #e2e8f0;
+    }
+
+    .h-100 {
+        height: 100% !important;
+    }
+
+    .shadow-none {
+        box-shadow: none !important;
+    }
+</style>
+<link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel=" stylesheet">
+<!--Replace with your tailwind.css once created-->
+<!--Regular Datatables CSS-->
+<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+<!--Responsive Extension Datatables CSS-->
+<link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
+
+<div class="container">
+    <div class="main-body">
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <!--Bilgiler-->
+                <div class="card">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0">İsim</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                    @Model.Product.Name @Model.Product.SurName
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                    <h6 class="mb-0">Meslek</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        @categoryName
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0">Telefon</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        @Model.Product.PhoneNumber
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0">Eğitim Durumu</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                    @educationStatusName
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0">Referans</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                    @referanceName
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0">Adres</h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        @Model.Product.Address
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <!--Sosyal Medya-->
+                <div class="card mt-3">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-twitter mr-2 icon-inline text-info"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>Twitter</h6>
+                            <span class="text-secondary">Twitter</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram mr-2 icon-inline text-danger"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>Instagram</h6>
+                            <span class="text-secondary">Instagram</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-facebook mr-2 icon-inline text-primary"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>Facebook</h6>
+                            <span class="text-secondary">Facebook</span>
+                        </li>
+                    </ul>
+                </div>
+                <!--Suggestions-->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6>Öneriler</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-action="CreateSuggestions">
+                            <div class="mb-3">
+                                <textarea class="form-control" name="Suggestion" rows="3" placeholder="Önerinizi yazınız..."></textarea>
+                            </div>
+                            <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+                            <button type="submit" class="btn btn-primary">Gönder</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--Container-->
+            <div class="container w-full md:w-4/5 xl:w-3/5  mx-auto px-1">
+                <!--Card-->
+                <div id='recipients' class="p-8 mt-6 lg:mt-0 rounded shadow bg-white overflow-x-auto">
+                    <table id="example" class="stripe hover table-left-align" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+                        <thead>
+                            <tr>
+                                <th data-priority="1" style="text-align: center;">Anket No</th>
+                                <th data-priority="2">Anket Adı</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var survey in Model.Survey)
+                            {
+                                var answered = Model.AnsweredSurveyIds.Contains(survey.Id);
+                                var rowClass = answered ? "table-success" : "table-danger"; // Yeşil veya kırmızı
+                                var clickAction = answered
+                                ? "" // Cevaplanmış anketlerde tıklama yok
+                                : $"onclick=\"document.getElementById('edit-form-{survey.Id}').submit();\" style=\"cursor: pointer;\""; // Cevaplanmamış anketler için tıklama
+
+                                <tr class="@rowClass" @Html.Raw(clickAction)>
+                                    <form id="edit-form-@survey.Id" method="get" asp-action="SolveSurvey" style="display:none;">
+                                        <input type="hidden" name="surveyId" value="@survey.Id" />
+                                        <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+                                    </form>
+                                    <td style="text-align: center;">@survey.Id</td>
+                                    <td style="text-align: center;">@survey.Title</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!--/Card-->
+                <!--Cevaplar-->
+                <div>
+                    <hr />
+                    @if (Model.LastAnsweredSurvey != null)
+                    {
+                        <h3>Son Cevaplanan Anket Numarası : @Model.LastAnsweredSurvey.SurveyTitle</h3>
+                        <table class="table table-bordered mt-3">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center;">Soru</th>
+                                    <th style="text-align: center;">Cevap</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.LastAnsweredSurvey.QuestionsAndAnswers)
+                                {
+                                    <tr>
+                                        <td style="text-align: center;">@item.QuestionText</td>
+                                        <td style="text-align: center;">
+                                            @(string.IsNullOrEmpty(item.Answer)
+                                                ? "Cevaplanmadı"
+                                                : item.Answer == "Yes" ? "Evet" : item.Answer == "No" ? "Hayır" : item.Answer)
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>Henüz bir anketi cevaplamadınız.</p>
+                    }
+                </div>
+            </div>
+            <!--/container-->
+
+        </div>
+    </div>
+</div>
+<!-- jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            responsive: true,
+            language: {
+                "decimal": "",
+                "emptyTable": "Tabloda veri bulunamadı",
+                "info": "_TOTAL_ kayıt içerisinden _START_ - _END_ arası gösteriliyor",
+                "infoEmpty": "Kayıt yok",
+                "infoFiltered": "(_MAX_ kayıt içerisinden filtrelendi)",
+                "lengthMenu": "_MENU_ kayıt göster",
+                "loadingRecords": "Yükleniyor...",
+                "processing": "İşleniyor...",
+                "search": "Ara:",
+                "zeroRecords": "Eşleşen kayıt bulunamadı",
+                "paginate": {
+                    "first": "İlk",
+                    "last": "Son",
+                    "next": "Sonraki",
+                    "previous": "Önceki"
+                },
+                "aria": {
+                    "sortAscending": ": Artan şekilde sırala",
+                    "sortDescending": ": Azalan şekilde sırala"
+                }
+            }
+        });
+    });
+</script>

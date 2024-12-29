@@ -1,0 +1,45 @@
+﻿@model UserDtoForCreation
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Users> UserManager
+@inject SignInManager<Users> SignInManager
+@{
+    ViewData["Title"] = "Yeni Kişi Ekle";
+}
+@{
+
+    var UserName = UserManager.GetUserName(User);
+
+
+}
+<h2>Yeni Kişi Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="AddedByUserName" value="@UserName" />
+    <div class="form-group">
+        <label asp-for="UserName">Kullanıcı Adı</label>
+        <input type="text" class="form-control" asp-for="UserName" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email">E-posta</label>
+        <input type="email" class="form-control" asp-for="Email" required />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password">Şifre</label>
+        <input type="password" class="form-control" asp-for="Password" required />
+    </div>
+
+    <div class="col-md-6">
+        <div class="lead p-2 mt-2">
+            <strong>Roller</strong>
+            @foreach (var role in Model.Roles)
+            {
+                <div class="form-check my-2">
+                    <input type="checkbox" name="Roles" value="@role" class="form-check-input" />
+                    <label class="form-check-label">@role</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>

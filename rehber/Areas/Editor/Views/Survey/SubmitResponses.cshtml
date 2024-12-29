@@ -1,0 +1,20 @@
+﻿<form asp-action="SubmitResponses" method="post">
+    @foreach (var question in Model.Questions)
+    {
+        <div class="form-group">
+            <label>@question.Text</label>
+            @if (question.AnswerType == "YesNo")
+            {
+                <div>
+                    <label><input type="radio" name="Responses[@question.Id]" value="Evet" /> Evet</label>
+                    <label><input type="radio" name="Responses[@question.Id]" value="Hayır" /> Hayır</label>
+                </div>
+            }
+            else if (question.AnswerType == "Text")
+            {
+                <input type="text" name="Responses[@question.Id]" class="form-control" />
+            }
+        </div>
+    }
+    <button type="submit">Cevapları Gönder</button>
+</form>

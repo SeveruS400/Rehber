@@ -1,0 +1,72 @@
+﻿@model IEnumerable<RequestSuggestions>
+
+<div class="container mt-5">
+    <h3 class="mb-4">Öneri Listesi</h3>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Öneri</th>
+                <th>Durum</th>
+                <th>Öneri Sahibi</th>
+                <th>Oluşturan</th>
+                <th>Oluşturulma Tarihi</th>
+                <th>Sonlandıran</th>
+                <th>Sonlandırma Tarihi</th>
+                <th>Rapor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var suggestion in Model)
+            {
+                <tr>
+                    <td>@suggestion.Id</td>
+                    <td>@suggestion.Suggestion</td>
+                    <td>@(suggestion.SuggestionStatus ? "Sonuçlandırıldı" : "Sonuçlandırılmadı")</td>
+                    <td>@suggestion.ProductId</td>
+
+                    <td>@(string.IsNullOrEmpty(suggestion.RequestCreatorId) ? "Bilinmiyor" : suggestion.RequestCreatorId)</td>
+                    <td>@suggestion.RequestCreateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(string.IsNullOrEmpty(suggestion.ReguestTerminatedId) ? "-" : suggestion.ReguestTerminatedId)</td>
+                    <td>
+                        @(suggestion.RequestTerminatTime.HasValue
+                            ? suggestion.RequestTerminatTime.Value.ToString("yyyy-MM-dd HH:mm")
+                            : "-")
+                    </td>
+
+
+                    <td>
+                        @if (!string.IsNullOrEmpty(suggestion.SuggesionReport))
+                        {
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#reportModal-@suggestion.Id">
+                                Görüntüle
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="reportModal-@suggestion.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Rapor Detayı</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            @suggestion.SuggesionReport
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <span>Rapor Yok</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

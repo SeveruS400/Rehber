@@ -1,0 +1,39 @@
+﻿<form asp-action="CreateSurvey" method="post">
+    <label for="title">Anket Başlığı</label>
+    <input type="text" id="title" name="Title" class="form-control" required />
+
+    <div id="questions-container">
+        <div class="question">
+            <label for="question-text-1">Soru 1</label>
+            <input type="text" id="question-text-1" name="Questions[0].Text" class="form-control" required />
+
+            <label for="question-type-1">Cevap Türü</label>
+            <select id="question-type-1" name="Questions[0].AnswerType" class="form-control">
+                <option value="YesNo">Evet-Hayır</option>
+                <option value="Text">Metin</option>
+            </select>
+        </div>
+    </div>
+    <button type="button" onclick="addQuestion()">Soru Ekle</button>
+    <button type="submit">Kaydet</button>
+</form>
+
+<script>
+    function addQuestion() {
+        const container = document.getElementById('questions-container');
+        const index = container.children.length + 1;
+        const questionHtml = `
+                <div class="question">
+                    <label for="question-text-${index}">Soru ${index}</label>
+                    <input type="text" id="question-text-${index}" name="Questions[${index - 1}].Text" class="form-control" required />
+
+                    <label for="question-type-${index}">Cevap Türü</label>
+                    <select id="question-type-${index}" name="Questions[${index - 1}].AnswerType" class="form-control">
+                        <option value="YesNo">Evet-Hayır</option>
+                        <option value="Text">Metin</option>
+                    </select>
+                </div>
+            `;
+        container.insertAdjacentHTML('beforeend', questionHtml);
+    }
+</script>

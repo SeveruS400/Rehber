@@ -1,0 +1,36 @@
+﻿@model SolveSurveyViewModel
+
+<div class="container">
+    <h2>Anket Çöz</h2>
+    <form asp-action="SubmitResponses" method="post">
+        @foreach (var question in Model.Questions)
+        {
+            <div class="mb-3">
+                <label class="form-label">@question.Text</label>
+                @if (question.AnswerType == "Text") 
+                {
+                    <input type="text" class="form-control" name="Responses[@question.QuestionId]" />
+                }
+                else if (question.AnswerType == "YesNo") 
+                {
+                    <div class="form-check">
+                        <input type="radio" id="yes-@question.QuestionId" name="Responses[@question.QuestionId]" value="Yes" class="form-check-input" />
+                        <label class="form-check-label" for="yes-@question.QuestionId">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="no-@question.QuestionId" name="Responses[@question.QuestionId]" value="No" class="form-check-input" />
+                        <label class="form-check-label" for="no-@question.QuestionId">No</label>
+                    </div>
+                }
+                else
+                {
+                    <p>Bu soru tipi desteklenmiyor.</p>
+                }
+            </div>
+        }
+
+        <input type="hidden" name="SurveyId" value="@Model.SurveyId" />
+        <input type="hidden" name="ProductId" value="@Model.ProductId" />
+        <button type="submit" class="btn btn-primary">Gönder</button>
+    </form>
+</div>

@@ -1,0 +1,23 @@
+﻿@model Users
+
+<div>
+    <h1>@Model.SessionTimeoutInHours</h1>
+</div>
+
+<a class="btn btn-outline-success ml-auto" asp-action="Create">
+    <i class="fa-solid fa-plus"></i>
+    Yeni Kişi Ekle
+</a>
+
+<form method="post" asp-action="Edit">
+    <div class="form-group">
+        <label for="sessionTimeout">Session Timeout (1 - 10)</label>
+        <select class="form-control" id="sessionTimeout" name="sessionTimeout">
+            @for (int i = 1; i <= 10; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

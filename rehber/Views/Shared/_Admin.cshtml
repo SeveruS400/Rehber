@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Users> UserManager
+@inject SignInManager<Users> SignInManager
+
+@{
+    var isAuthenticated = SignInManager.IsSignedIn(User);
+    var user = UserManager.GetUserAsync(User).Result; // Kullanıcıyı alıyoruz
+    var isAdmin = false;
+
+    if (user != null)
+    {
+        var roles = UserManager.GetRolesAsync(user).Result; // Kullanıcının rollerini alıyoruz
+        isAdmin = roles.Contains("Admin");
+    }
+}
+
+@if (isAuthenticated && isAdmin)
+{
+
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a>
+    </li>
+
+}
+else
+{
+
+}

@@ -1,0 +1,92 @@
+﻿@model ProductDtoForInsertion
+
+<div class="text-center">
+    <div class="display-6">Yeni Kişi Ekle</div>
+</div>
+<form method="post" asp-action="Create" enctype="multipart/form-data">
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <div class="form-group my-3">
+        <label asp-for="CategoryId">Meslek</label>
+        <select class="form-control" asp-for="CategoryId" id="categorySelect">
+            @foreach (Categories category in ViewBag.Category)
+            {
+                <option value="@category.Id">@category.CategoryName</option>
+            }
+            <option value="other">Diğer</option>
+        </select>
+    </div>
+
+    <div class="form-group my-3" id="otherCategoryDiv" style="display: none;">
+        <label for="otherCategory">Yeni Meslek Adı</label>
+        <input type="text" class="form-control" id="otherCategory" name="NewCategoryName" placeholder="Yeni meslek adı girin" />
+    </div>
+
+    <div class="form-group my-3">
+        <label asp-for="EducationStatusId">Eğitim Durumu</label>
+        <select class="form-control" asp-for="EducationStatusId">
+            @foreach (EducationStatus EducationStatus in ViewBag.EducationStatus)
+            {
+                <option value="@EducationStatus.Id">@EducationStatus.EducationStatusName</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group my-3">
+        <label asp-for="ReferanceId">Referans</label>
+        <select class="form-control" asp-for="ReferanceId" id="referanceSelect">
+            @foreach (Referance Referance in ViewBag.Referance)
+            {
+                <option value="@Referance.Id">@Referance.ReferanceName</option>
+            }
+            <option value="other">Diğer</option>
+        </select>
+    </div>
+    <div class="form-group my-3" id="otherreferanceDiv" style="display: none;">
+        <label for="otherreferance">Yeni Referans Adı</label>
+        <input type="text" class="form-control" id="otherreferance" name="NewReferanceName" placeholder="Yeni referans girin" />
+    </div>
+
+    <div class="form-group my-3">
+        <label asp-for="Name">İsim</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="form-group my-3">
+        <label asp-for="SurName">Soyisim</label>
+        <input asp-for="SurName" class="form-control" />
+    </div>
+
+    <div class="form-group my-3">
+        <label asp-for="Address">Adres</label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+
+    <div class="form-group my-3">
+        <label asp-for="PhoneNumber">Telefon Numarası</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+    </div>
+
+    <div class="form-group my-3">
+        <button class="btn btn-primary" type="submit">Kaydet</button>
+    </div>
+</form>
+
+<script>
+    document.getElementById('categorySelect').addEventListener('change', function () {
+        var otherCategoryDiv = document.getElementById('otherCategoryDiv');
+        if (this.value === 'other') {
+            otherCategoryDiv.style.display = 'block'; // Göster
+        } else {
+            otherCategoryDiv.style.display = 'none'; // Gizle
+        }
+    });
+    document.getElementById('referanceSelect').addEventListener('change', function () {
+        var otherreferanceDiv = document.getElementById('otherreferanceDiv');
+        if (this.value === 'other') {
+            otherreferanceDiv.style.display = 'block'; // Göster
+        } else {
+            otherreferanceDiv.style.display = 'none'; // Gizle
+        }
+    });
+</script>

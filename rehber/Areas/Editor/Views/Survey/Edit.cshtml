@@ -1,0 +1,115 @@
+﻿@model IEnumerable<SurveyQuestion>
+
+@{
+    var i = 1; // Döngü sayacı dışarıda tanımlanıyor.
+}
+
+<form method="post" asp-action="Edit" enctype="multipart/form-data">
+    <div class="text-danger" asp-validation-summary="All"></div>
+
+    <div id='recipients' class="p-8 mt-6 lg:mt-0 rounded shadow bg-white overflow-x-auto">
+        <table id="example" class="stripe hover table-left-align" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+            <thead>
+                <tr>
+                    <th data-priority="1">#</th>
+                    <th data-priority="2">Soru</th>
+                    <th data-priority="3">Soru Tipi</th>
+                    <th data-priority="4">Düzenle</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var surveyQuestion in Model)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@surveyQuestion.Text</td>
+                        <td>
+                            @{
+                                var displayAnswerType = surveyQuestion.AnswerType switch
+                                {
+                                    "Text" => "Yazı",
+                                    "YesNo" => "Evet/Hayır",
+                                    _ => surveyQuestion.AnswerType // Varsayılan olarak gelen değer
+                                };
+                            }
+                            @displayAnswerType
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
+                                    onclick="setEditModalData(@surveyQuestion.Id, '@surveyQuestion.Text', '@surveyQuestion.AnswerType', @surveyQuestion.SurveyId)">
+                                Düzenle
+                            </button>
+
+                        </td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<!-- Düzenleme Modalı -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Soru Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" method="post" asp-action="Edit">
+
+                    <input type="hidden" id="editQuestionId" name="Id" />
+                    <input type="hidden" id="editSurveyId" name="SurveyId" />
+
+                    <div class="mb-3">
+                        <label for="editQuestionText" class="form-label">Soru</label>
+                        <input type="text" class="form-control" id="editQuestionText" name="Text" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAnswerType" class="form-label">Soru Tipi</label>
+                        <select class="form-select" id="editAnswerType" name="AnswerType">
+                            <option value="Text">Metin</option>
+                            <option value="YesNo">Evet/Hayır</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="submit" form="editForm" class="btn btn-primary">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    // Modal için verileri ayarla
+    function setEditModalData(id, text, answerType, surveyId) {
+        // Gizli alanlar
+        document.getElementById('editQuestionId').value = id;
+        document.getElementById('editSurveyId').value = surveyId;
+
+        // Görünür alan
+        document.getElementById('displaySurveyId').value = surveyId;
+
+        // Diğer alanlar
+        document.getElementById('editQuestionText').value = text;
+        document.getElementById('editAnswerType').value = answerType;
+
+        // Diğer alanlar: answerType (seçili seçenek)
+        var answerTypeSelect = document.getElementById('editAnswerType');
+
+        // Seçili olan AnswerType'ı ayarla
+        for (var i = 0; i < answerTypeSelect.options.length; i++) {
+            if (answerTypeSelect.options[i].value === answerType) {
+                answerTypeSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+</script>

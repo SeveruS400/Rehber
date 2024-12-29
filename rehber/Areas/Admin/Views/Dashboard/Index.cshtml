@@ -1,0 +1,108 @@
+﻿@model IEnumerable<UserWithRolesDto>
+
+<h2>Users and Their Roles</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kullanıcı Adı</th>
+            <th>E-mail</th>
+            <th>Roller</th>
+            <th>Ekleyen Kişi</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    @foreach (var role in user.Roles)
+                    {
+                        <span>@role</span>
+                        <br />
+                    }
+                </td>
+                <td>@user.AddedByUserName</td>
+                <td>
+                    <a class="btn btn btn-warning rounded-0" asp-action="Update" asp-route-id="@user.UserName">
+                        <i class="fa fa-solid fa-edit"></i>
+                        Edit
+                    </a>
+                    <a class="btn btn btn-info rounded-0" asp-action="ResetPassword" asp-route-id="@user.UserName">
+                        <i class="fa fa-solid fa-edit"></i>
+                        Reset Password
+                    </a>
+                    <form method="post" asp-action="Delete">
+                        <input type="hidden" name="UserName" value="@user.UserName" />
+                        <button type="submit" class="btn btn-danger rounded-0">
+                            <i class="fa fa-solid fa-trash"></i>
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editUserForm" method="post" action="/User/Edit">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editUserName" class="form-label">User Name</label>
+                        <input type="text" class="form-control" id="editUserName" name="UserName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="Email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRoles" class="form-label">Roles</label>
+                        <input type="text" class="form-control" id="editRoles" name="Roles" placeholder="Comma separated">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openEditModal(userName, email, roles) {
+        document.getElementById('editUserName').value = userName;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editRoles').value = roles.join(', ');
+    }
+
+    function deleteUser(userName) {
+        if (confirm(`Are you sure you want to delete user ${userName}?`)) {
+            fetch(`/Admin/Dashboard/Delete?userName=${userName}`, {
+                method: 'POST',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('User deleted successfully.');
+                        location.reload();
+                    } else {
+                        response.text().then(error => alert(`Failed to delete user: ${error}`));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
+</script>

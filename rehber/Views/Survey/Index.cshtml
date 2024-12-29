@@ -1,0 +1,118 @@
+﻿@model IEnumerable<Survey>
+
+
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>DataTables </title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel=" stylesheet">
+	<!--Replace with your tailwind.css once created-->
+	<!--Regular Datatables CSS-->
+	<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+	<!--Responsive Extension Datatables CSS-->
+	<link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gray-100 text-gray-900 tracking-wider leading-normal">
+	
+
+	<!--Container-->
+	<div class="container w-full md:w-4/5 xl:w-3/5  mx-auto px-1">
+		<div class="flex items-center justify-between px-2 py-8">
+			<!-- Başlık -->
+			<h1 class="font-sans font-bold break-normal text-indigo-500 text-xl md:text-2xl">
+				Anketler
+			</h1>
+		</div>
+
+		<!--Card-->
+		<div id='recipients' class="p-8 mt-6 lg:mt-0 rounded shadow bg-white overflow-x-auto">
+
+
+			<table id="example" class="stripe hover table-left-align" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+				<thead>
+					<tr>
+						<th data-priority="1" style="text-align: center;">Anket No</th>
+						<th data-priority="2">Anket Adı</th>
+						<th data-priority="3" style="text-align: center;">Oluşturulma Tarihi</th>
+						<th data-priority="4" style="text-align: center;">Son Düzenlenme Tarihi</th>
+
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var survey in Model)
+					{
+						<tr onclick="document.getElementById('edit-form-@survey.Id').submit();" style="cursor: pointer;">
+							<form id="edit-form-@survey.Id" method="get" asp-action="Edit" asp-route-id="@survey.Id" style="display:none;">
+								<input type="hidden" name="id" value="@survey.Id" />
+							</form>
+							<td style="text-align: center;">@survey.Id</td>
+							<td>@survey.Title</td>
+							<td style ="text-align: center;">@survey.CreatedDate.ToString("dd/MM/yyyy")</td>
+							<td style ="text-align: center;">@survey.LastEditDate.ToString("dd/MM/yyyy")</td>
+						</tr>
+					}
+				</tbody>
+
+			</table>
+
+
+		</div>
+		<!--/Card-->
+
+
+	</div>
+	<!--/container-->
+	<!-- jQuery -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+	<!--Datatables -->
+	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+	
+
+	<script>
+		$(document).ready(function () {
+
+			var table = $('#example').DataTable({
+				responsive: false,
+				language: {
+					"decimal": "",
+					"emptyTable": "Tabloda veri bulunamadı",
+					"info": "_TOTAL_ kayıt içerisinden _START_ - _END_ arası gösteriliyor",
+					"infoEmpty": "Kayıt yok",
+					"infoFiltered": "(_MAX_ kayıt içerisinden filtrelendi)",
+					"infoPostFix": "",
+					"thousands": ".",
+					"lengthMenu": "_MENU_ kayıt göster",
+					"loadingRecords": "Yükleniyor...",
+					"processing": "İşleniyor...",
+					"search": "Ara:",
+					"zeroRecords": "Eşleşen kayıt bulunamadı",
+					"paginate": {
+						"first": "İlk",
+						"last": "Son",
+						"next": "Sonraki",
+						"previous": "Önceki"
+					},
+					"aria": {
+						"sortAscending": ": Artan şekilde sırala",
+						"sortDescending": ": Azalan şekilde sırala"
+					}
+				}
+			})
+				.columns.adjust()
+				.responsive.recalc();
+		});
+	</script>
+
+</body>
+
+</html>
