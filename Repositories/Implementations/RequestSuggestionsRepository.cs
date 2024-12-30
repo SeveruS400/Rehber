@@ -30,7 +30,10 @@ namespace Repositories.Implementations
         {
             return GetAll(false).Include(r =>r.Products);
         }
-
+        public IEnumerable<RequestSuggestions> GetAllRequestSuggestionsByProductId(int productId)
+        {
+            return GetAll(false).Include(r => r.Products).Where(r =>r.ProductId==productId);
+        }
         public IEnumerable<RequestSuggestions> GetAllCompletedRequestSuggestions()
         {
             return GetAll(false).Where(r => r.SuggestionStatus.Equals(true)).ToList();
@@ -41,5 +44,9 @@ namespace Repositories.Implementations
             return GetAll(false).Where(r => r.SuggestionStatus.Equals(false)).ToList();
         }
 
+        public RequestSuggestions GetRequestSuggestionBySuggestionId(int suggestionId)
+        {
+            return _context.RequestSuggestions.FirstOrDefault(u => u.Id == suggestionId);
+        }
     }
 }

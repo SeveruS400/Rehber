@@ -29,5 +29,20 @@ namespace Repositories.Implementations
 
             return Referance;
         }
+
+        public int GetReferanceId(string referanceName)
+        {
+            var referance = _context.Referances.FirstOrDefault(r => r.ReferanceName == referanceName);
+
+            // Kategori bulunduysa, Id'yi döndür
+            if (referance != null)
+            {
+                return referance.Id;
+            }
+
+            // Kategori bulunamadıysa, uygun bir değer döndür
+            // Örneğin -1 ya da null döndürebilirsiniz, ihtiyaçlarınıza göre
+            return -1;
+        }
     }
 }

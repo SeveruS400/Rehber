@@ -14,5 +14,7 @@ namespace Repositories.Contracts
         IEnumerable<RequestSuggestions> GetAllRequestSuggestions();
         IEnumerable<RequestSuggestions> GetAllCompletedRequestSuggestions();
         IEnumerable<RequestSuggestions> GetUncompletedRequestSuggestions();
+        IEnumerable<RequestSuggestions> GetAllRequestSuggestionsByProductId(int productId);
+        RequestSuggestions GetRequestSuggestionBySuggestionId(int suggestionId);
     }
 }

@@ -4,8 +4,10 @@ using Entities.RequestParameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OfficeOpenXml;
 using rehber.Models;
 using Services.Contracts;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace rehber.Areas.Admin.Controllers
@@ -128,44 +130,6 @@ namespace rehber.Areas.Admin.Controllers
                 .Distinct()
                 .ToHashSet();
 
-            //// Kullanıcının son cevapladığı anketin soruları ve cevapları
-            //var responses = _serviceManager.SurveyResponseService.GetResponsesByUserId(Id);
-
-            //// Eğer kullanıcı bir anketi cevaplamışsa, en son cevapladığı anketi bul
-            //var lastAnsweredResponse = responses
-            //    .OrderByDescending(response => response.Id) // ID'yi kullanarak sırala
-            //    .FirstOrDefault(); // En son cevabı al
-
-            //// Eğer en son cevaplı anket bulunmuşsa
-            //LastSurveyViewModel lastAnsweredSurveyViewModel = null;
-
-            //if (lastAnsweredResponse != null)
-            //{
-            //    var lastSurvey = lastAnsweredResponse.Question.Survey;
-
-            //    // Soruları ve cevapları alıyoruz
-            //    var surveyQuestionsAndResponses = _serviceManager.SurveyQuestionService
-            //        .GetAllSurveyQuestion(false, lastSurvey.Id)
-            //        .Select(question => new QuestionAnswerViewModel
-            //        {
-            //            QuestionText = question.Text,
-            //            Answer = question.Responses != null && question.Responses.Any(r => r.UserId == Id)
-            //                ? question.Responses
-            //                    .Where(r => r.UserId == Id) // Kullanıcının cevabı
-            //                    .Select(r => r.ResponseText)
-            //                    .FirstOrDefault() ?? "Yanıt Verilmedi"
-            //                : "Yanıt Verilmedi"
-            //        }).ToList();
-
-
-            //    // ViewModel oluşturuyoruz
-            //    lastAnsweredSurveyViewModel = new LastSurveyViewModel
-            //    {
-            //        SurveyId = lastSurvey.Id,
-            //        SurveyTitle = lastSurvey.Title,
-            //        QuestionsAndAnswers = surveyQuestionsAndResponses
-            //    };
-            //}
             var LastSolvedSurveyId = _serviceManager.SurveyResponseService.LastSolvedSurveyId(product.Id);
             var responses = _serviceManager.SurveyResponseService.GetResponsesWithSurveyIDByUserId(product.Id, LastSolvedSurveyId);
             var responseViewModel = responses.Select(response => new QuestionAnswerViewModel
@@ -182,6 +146,7 @@ namespace rehber.Areas.Admin.Controllers
                 QuestionsAndAnswers = responseViewModel
             };
 
+            var requestSuggestions = _serviceManager.RequestSuggestionsService.GetAllRequestSuggestionsByProductId(product.Id);
             return View(new ProductViewModel()
             {
                 Product = product,
@@ -190,7 +155,8 @@ namespace rehber.Areas.Admin.Controllers
                 Referance = Referance,
                 Survey = Surveys,
                 AnsweredSurveyIds = answeredSurveyIds,
-                LastAnsweredSurvey = lastAnsweredSurveyViewModel
+                LastAnsweredSurvey = lastAnsweredSurveyViewModel,
+                RequestSuggestions = requestSuggestions
             });
 
         }
@@ -240,5 +206,150 @@ namespace rehber.Areas.Admin.Controllers
         }
         #endregion
 
+        #region Suggestions
+        [HttpPost]
+        public IActionResult CreateSuggestions(RequestSuggestions suggestionModel)
+        {
+            if (string.IsNullOrWhiteSpace(suggestionModel.Suggestion))
+            {
+                // Öneri boşsa hata mesajı
+                TempData["Error"] = "Öneri metni boş olamaz.";
+                return RedirectToAction("Index"); // Geri döneceğiniz sayfa
+            }
+
+            suggestionModel.RequestCreateTime = DateTime.Now; // Oluşturma zamanı
+            suggestionModel.SuggestionStatus = false; // Öneri durumu başlangıçta false
+            suggestionModel.RequestCreatorId = User.Identity.Name; // Kullanıcı ID'sini al
+
+            _serviceManager.RequestSuggestionsService.CreateRequestSuggestion(suggestionModel);
+
+            TempData["Success"] = "Öneriniz başarıyla kaydedildi!";
+            return RedirectToAction("Index"); // Geri döneceğiniz sayfa
+        }
+
+        [HttpPost]
+        public IActionResult EditSuggestions(int suggestionId, string reportText)
+        {
+            var ReguestTerminatedId = User.Identity.Name;
+            _serviceManager.RequestSuggestionsService.UpdateRequestSuggestions(suggestionId, reportText,ReguestTerminatedId);
+            return RedirectToAction("Index");
+        }
+        #endregion
+
+        [HttpPost]
+        public IActionResult UploadExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Lütfen bir Excel dosyası seçin.");
+            }
+
+            var products = new List<Products>();
+
+            // Excel dosyasını okuma
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            using (var stream = new MemoryStream())
+            {
+                file.CopyTo(stream);
+                using (var package = new ExcelPackage(stream))
+                {
+                    var worksheet = package.Workbook.Worksheets[0]; // İlk sayfa
+                    int rowCount = worksheet.Dimension.End.Row;
+
+                    for (int row = 2; row <= rowCount; row++) // Başlık satırını atla
+                    {
+                        var product = new Products
+                        {
+                            Name = worksheet.Cells[row, 1].Text,
+                            SurName = worksheet.Cells[row, 2].Text,
+                            Address = worksheet.Cells[row, 3].Text,
+                            PhoneNumber = worksheet.Cells[row, 6].Text,
+                            ShowCase = true,
+                        };
+
+                        var categoryName = worksheet.Cells[row, 7].Text; // Kategori adı
+                        if (!string.IsNullOrEmpty(categoryName))
+                        {
+                            var category = _serviceManager.CategoryService.GetAllCategories(false).FirstOrDefault(c => c.CategoryName == categoryName);
+                            if (category == null)
+                            {
+                                
+                                // Yeni kategori ekle
+                                category = new Categories { CategoryName = categoryName };
+                                _serviceManager.CategoryService.AddCategory(category);
+                                var categoryId = _serviceManager.CategoryService.GetCategoryId(categoryName);
+                                product.CategoryId = categoryId;
+                            }
+                            else
+                            {
+                                product.CategoryId = category.Id;
+                            }
+                            
+                        }
+
+                        var referanceName = worksheet.Cells[row, 4].Text;
+                        if (!string.IsNullOrEmpty(referanceName))
+                        {
+                            var referance = _serviceManager.ReferanceService.GetAllReferances(false).FirstOrDefault( c => c.ReferanceName == referanceName);
+                            if (referance == null)
+                            {
+
+                                // Yeni kategori ekle
+                                referance = new Referance { ReferanceName = referanceName };
+                                _serviceManager.ReferanceService.AddReferance(referance);
+                                var referanceId = _serviceManager.CategoryService.GetCategoryId(categoryName);
+                                product.ReferanceId = referanceId;
+                            }
+                            else
+                            {
+                                product.ReferanceId = referance.Id;
+                            }
+
+                        }
+
+                        var educationStatusName = worksheet.Cells[row, 5].Text.ToLower(); // Gelen değer küçük harfe çevir
+                        int? educationStatusId = null;
+                        if (!string.IsNullOrEmpty(educationStatusName))
+                        {
+                            // Eğitim durumu eşlemesi
+                            switch (educationStatusName)
+                            {
+                                case "ilkokul":
+                                    educationStatusId = 1; // İlkokul ID'si
+                                    break;
+                                case "ortaokul":
+                                    educationStatusId = 2; // Ortaokul ID'si
+                                    break;
+                                case "lise":
+                                    educationStatusId = 3; // Lise ID'si
+                                    break;
+                                case "üniversite":
+                                    educationStatusId = 4; // Ortaokul ID'si
+                                    break;
+                                case "yüksek lisans":
+                                    educationStatusId = 5; // Lise ID'si
+                                    break;
+                                case "doktora":
+                                    educationStatusId = 6; // Lise ID'si
+                                    break;
+                                default:
+                                    educationStatusId = -1;
+                                    break;
+                            }
+                            product.EducationStatusId = educationStatusId;
+                        }
+                        if (!string.IsNullOrEmpty(product.Name) && !string.IsNullOrEmpty(product.SurName) && !string.IsNullOrEmpty(product.PhoneNumber))
+                        {
+							products.Add(product);
+						}
+                    }
+                }
+            }
+
+            // Ürünleri kaydetme
+            _serviceManager.ProductService.SaveProducts(products);
+
+            return RedirectToAction("Index");
+        }
     }
 }

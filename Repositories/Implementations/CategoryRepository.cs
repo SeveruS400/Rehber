@@ -20,7 +20,20 @@ namespace Repositories.Implementations
             _context.Categories.Add(category);
             _context.SaveChanges();
         }
+        public int GetCategoryId(string categoryName)
+        {
+            var category = _context.Categories.FirstOrDefault(r => r.CategoryName == categoryName);
 
+            // Kategori bulunduysa, Id'yi döndür
+            if (category != null)
+            {
+                return category.Id;
+            }
+
+            // Kategori bulunamadıysa, uygun bir değer döndür
+            // Örneğin -1 ya da null döndürebilirsiniz, ihtiyaçlarınıza göre
+            return -1;
+        }
         public IEnumerable<Categories> GetAllCategories(bool trackChanges)
         {
             // trackChanges true ise veriler izlenir, değilse AsNoTracking ile performans kazanılır

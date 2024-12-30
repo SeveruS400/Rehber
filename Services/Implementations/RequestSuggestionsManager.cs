@@ -39,9 +39,30 @@ namespace Services.Implementations
             return _manager.RequestSuggestions.GetAllRequestSuggestions();
         }
 
+        public IEnumerable<RequestSuggestions> GetAllRequestSuggestionsByProductId(int productId)
+        {
+            return _manager.RequestSuggestions.GetAllRequestSuggestionsByProductId(productId);
+        }
+
+        public RequestSuggestions GetRequestSuggestionBySuggestionId(int suggestionId)
+        {
+            return _manager.RequestSuggestions.GetRequestSuggestionBySuggestionId(suggestionId);
+        }
+
         public IEnumerable<RequestSuggestions> GetUncompletedRequestSuggestions()
         {
             return _manager.RequestSuggestions.GetUncompletedRequestSuggestions();
+        }
+
+        public void UpdateRequestSuggestions(int suggestionId, string reportText, string ReguestTerminatedId)
+        {
+            var suggestion = _manager.RequestSuggestions.GetRequestSuggestionBySuggestionId(suggestionId);
+            suggestion.SuggesionReport = reportText;
+            suggestion.RequestTerminatTime = DateTime.Now;
+            suggestion.SuggestionStatus = true;
+            suggestion.ReguestTerminatedId = ReguestTerminatedId;
+
+            _manager.Save();
         }
     }
 }

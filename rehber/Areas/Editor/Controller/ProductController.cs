@@ -240,5 +240,24 @@ namespace rehber.Areas.Editor.Controllers
         }
         #endregion
 
+        [HttpPost]
+        public IActionResult CreateSuggestions(RequestSuggestions suggestionModel)
+        {
+            if (string.IsNullOrWhiteSpace(suggestionModel.Suggestion))
+            {
+                // Öneri boşsa hata mesajı
+                TempData["Error"] = "Öneri metni boş olamaz.";
+                return RedirectToAction("Index"); // Geri döneceğiniz sayfa
+            }
+
+            suggestionModel.RequestCreateTime = DateTime.Now; // Oluşturma zamanı
+            suggestionModel.SuggestionStatus = false; // Öneri durumu başlangıçta false
+            suggestionModel.RequestCreatorId = User.Identity.Name; // Kullanıcı ID'sini al
+
+            _serviceManager.RequestSuggestionsService.CreateRequestSuggestion(suggestionModel);
+
+            TempData["Success"] = "Öneriniz başarıyla kaydedildi!";
+            return RedirectToAction("Index"); // Geri döneceğiniz sayfa
+        }
     }
 }

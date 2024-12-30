@@ -27,5 +27,10 @@ namespace Services.Implementations
         {
             _manager.Category.AddCategory(category);
         }
+
+        public int GetCategoryId(string categoryName)
+        {
+            return _manager.Category.GetCategoryId(categoryName);
+        }
     }
 }

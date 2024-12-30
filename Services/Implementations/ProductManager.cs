@@ -5,7 +5,6 @@ using Entities.RequestParameters;
 using Repositories.Contracts;
 using Services.Contracts;
 
-
 namespace Services.Implementations
 {
     public class ProductManager : IProductService
@@ -82,6 +81,11 @@ namespace Services.Implementations
         {
             var products = _manager.Product.GetShowCaseProducts(trackChanges);
             return products;
+        }
+
+        public void SaveProducts(List<Products> products)
+        {
+            _manager.Product.SaveProducts(products);
         }
 
         public void UpdateProduct(ProductDtoForUpdate productDto)

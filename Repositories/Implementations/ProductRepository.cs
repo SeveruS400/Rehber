@@ -47,5 +47,11 @@ namespace Repositories.Implementations
         }
 
         public async Task UpdateProduct(Products entity) => await UpdateAsync(entity.Id, entity);
+        public void SaveProducts(List<Products> products)
+        {
+            _context.Products.AddRange(products);
+            _context.SaveChanges();
+        }
+
     }
 }

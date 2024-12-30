@@ -62,18 +62,6 @@ namespace rehber.Areas.Admin.Controllers
             return RedirectToAction("Index"); // Eğer model geçerli değilse formu tekrar render ederiz
         }
 
-        //[HttpGet]
-        //public IActionResult Create()
-        //{
-        //    return View(new UserDtoForCreation()
-        //    {
-        //        Roles = new HashSet<string>(_serviceManager
-        //            .AuthService
-        //            .Roles
-        //            .Select(r => r.Name)
-        //            .ToList())
-        //    });
-        //}
         [HttpGet]
         public IActionResult Create()
         {

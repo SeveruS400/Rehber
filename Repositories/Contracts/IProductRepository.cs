@@ -16,5 +16,6 @@ namespace Repositories.Contracts
         Products GetOneProduct(int id, bool trackChanges);
         Task CreateProduct(Products product);
         Task UpdateProduct(Products entity);
+        void SaveProducts(List<Products> products);
     }
 }

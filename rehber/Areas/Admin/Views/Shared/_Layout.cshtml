@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - rehber</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="D:\Projects\rehber\rehber\wwwroot\css\bootstrap.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/af-2.7.0/b-3.2.0/kt-2.12.1/r-3.0.3/rg-1.5.1/sc-2.4.3/sb-1.8.1/sp-2.3.3/sl-2.1.0/datatables.min.css" rel="stylesheet">
 </head>
@@ -28,20 +28,11 @@
                             <a class="nav-link text-dark" asp-area="Admin" asp-controller="Product" asp-action="Index">Kişiler</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Survey" asp-action="Index">Survey</a>
+                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Survey" asp-action="Index">Anketler</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
-                        <!-- ms-auto sınıfı eklendi -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">User</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-black" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Settings" asp-action="Index">Ayarlar</a>
-                        </li>
+                        <partial name="_DropDown" />
                     </ul>
                 </div>
             </div>
@@ -62,7 +53,7 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/bootstrap.js" asp-append-version="true"></script>
+    <script src="D:\Projects\rehber\rehber\wwwroot\js\bootstrap.js" asp-append-version="true"></script>
     <script src="https://kit.fontawesome.com/54d0f5ad44.js" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/af-2.7.0/b-3.2.0/kt-2.12.1/r-3.0.3/rg-1.5.1/sc-2.4.3/sb-1.8.1/sp-2.3.3/sl-2.1.0/datatables.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

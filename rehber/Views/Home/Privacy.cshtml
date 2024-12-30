@@ -5,36 +5,66 @@
     <table class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Öneri</th>
-                <th>Durum</th>
-                <th>Öneri Sahibi</th>
-                <th>Oluşturan</th>
-                <th>Oluşturulma Tarihi</th>
-                <th>Sonlandıran</th>
-                <th>Sonlandırma Tarihi</th>
-                <th>Rapor</th>
+                <th data-priority="1" style="text-align: center;">Öneri</th>
+                <th data-priority="2" style="text-align: center;">Durum</th>
+                <th data-priority="3" style="text-align: center;">Oluşturan</th>
+                <th data-priority="4" style="text-align: center;">Oluşturulma Tarihi</th>
+                <th data-priority="5" style="text-align: center;">Sonlandıran</th>
+                <th data-priority="6" style="text-align: center;">Sonlandırma Tarihi</th>
+                <th data-priority="7" style="text-align: center;">Rapor</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var suggestion in Model)
             {
                 <tr>
-                    <td>@suggestion.Id</td>
-                    <td>@suggestion.Suggestion</td>
-                    <td>@(suggestion.SuggestionStatus ? "Sonuçlandırıldı" : "Sonuçlandırılmadı")</td>
-                    <td>@suggestion.ProductId</td>
-
-                    <td>@(string.IsNullOrEmpty(suggestion.RequestCreatorId) ? "Bilinmiyor" : suggestion.RequestCreatorId)</td>
-                    <td>@suggestion.RequestCreateTime.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@(string.IsNullOrEmpty(suggestion.ReguestTerminatedId) ? "-" : suggestion.ReguestTerminatedId)</td>
                     <td>
-                        @(suggestion.RequestTerminatTime.HasValue
-                            ? suggestion.RequestTerminatTime.Value.ToString("yyyy-MM-dd HH:mm")
-                            : "-")
+                        @{
+                            var shortText = suggestion.Suggestion.Length > 10
+                            ? suggestion.Suggestion.Substring(0, 10) + "..."
+                            : suggestion.Suggestion;
+
+                            var fullText = suggestion.Suggestion; // Tam metin
+                        }
+
+                        <span style="cursor: pointer; color: blue;" data-bs-toggle="modal" data-bs-target="#suggestionModal-@suggestion.Id">
+                            @shortText
+                        </span>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="suggestionModal-@suggestion.Id" tabindex="-1" aria-labelledby="suggestionModalLabel-@suggestion.Id" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="suggestionModalLabel-@suggestion.Id">Öneri Detayı</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" style="word-wrap: break-word; overflow-wrap: break-word;">
+                                        @fullText
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </td>
+                    <td style="text-align: center;">
+                        @Html.Raw(suggestion.SuggestionStatus
+                    ? "<i class='fas fa-check-circle' style='color: green;' title='Sonuçlandırıldı'></i>"
+                    : "<i class='fas fa-times-circle' style='color: red;' title='Sonuçlandırılmadı'></i>")
                     </td>
 
 
+                    <td style="text-align: center;">@(string.IsNullOrEmpty(suggestion.RequestCreatorId) ? "Bilinmiyor" : suggestion.RequestCreatorId)</td>
+                    <td style="text-align: center;">@suggestion.RequestCreateTime.ToString("dd-MM-yyyy")</td>
+                    <td style="text-align: center;">@(string.IsNullOrEmpty(suggestion.ReguestTerminatedId) ? "-" : suggestion.ReguestTerminatedId)</td>
+                    <td style="text-align: center;">
+                        @(suggestion.RequestTerminatTime.HasValue
+                            ? suggestion.RequestTerminatTime.Value.ToString("dd-MM-yyyy")
+                            : "-")
+                    </td>
                     <td>
                         @if (!string.IsNullOrEmpty(suggestion.SuggesionReport))
                         {

@@ -1,0 +1,46 @@
+﻿<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Ayarlar
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Settings" asp-action="Create">Yeni Kullanıcı Ekle</a></li>
+        <li>
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#reportModal">
+                Oturum Zamanı
+            </a>
+        </li>
+        <li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">Kullanıcı Görünümü</a></li>
+        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Çıkış Yap</a></li>
+    </ul>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-area="Admin" asp-controller="Settings" asp-action="Edit">
+                <div class="modal-body">
+                
+                        <div class="form-group">
+                            <label for="sessionTimeout">Session Timeout (1 - 10)</label>
+                            <select class="form-control" id="sessionTimeout" name="sessionTimeout">
+                                @for (int i = 1; i <= 10; i++)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

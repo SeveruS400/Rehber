@@ -44,13 +44,14 @@
         background-color: #fff;
         background-clip: border-box;
         border: 0 solid rgba(0,0,0,.125);
-        border-radius: .25rem;
+        border-radius: .16rem;
     }
 
     .card-body {
         flex: 1 1 auto;
         min-height: 1px;
         padding: 1rem;
+        font-size: 20px;
     }
 
     .gutters-sm {
@@ -61,6 +62,7 @@
         .gutters-sm > .col, .gutters-sm > [class*=col-] {
             padding-right: 8px;
             padding-left: 8px;
+            width: 30%;
         }
 
     .mb-3, .my-3 {
@@ -79,44 +81,13 @@
         box-shadow: none !important;
     }
 </style>
-<!--
-<form method="post" asp-action="Edit" enctype="multipart/form-data">
+<link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel=" stylesheet">
+<!--Replace with your tailwind.css once created-->
+<!--Regular Datatables CSS-->
+<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+<!--Responsive Extension Datatables CSS-->
+<link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
 
-    <div class="text-danger" asp-validation-summary="All"></div>
-
-    <input type="hidden" asp-for="Id" />
-
-    <div class="form-group my-3">
-        <label asp-for="CategoryId">Meslek</label>
-        <select class="form-control" asp-for="CategoryId">
-
-        </select>
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="Name">İsim</label>
-        <input asp-for="Name" class="form-control" />
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="SurName">Soyisim</label>
-        <input asp-for="SurName" class="form-control" />
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="Address">Adres</label>
-        <input asp-for="Address" class="form-control" />
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="PhoneNumber">Telefon Numarası</label>
-        <input asp-for="PhoneNumber" class="form-control" />
-    </div>
-    <div class="form-group my-3">
-        <button class="btn btn-primary" type="submit">Kaydet</button>
-    </div>
-</form>
--->
 <div class="container">
     <div class="main-body">
         <div class="row gutters-sm">
@@ -215,8 +186,23 @@
                         </li>
                     </ul>
                 </div>
+                <!--Suggestions-->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6>Öneriler</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-action="CreateSuggestions">
+                            <div class="mb-3">
+                                <textarea class="form-control" name="Suggestion" rows="3" placeholder="Önerinizi yazınız..."></textarea>
+                            </div>
+                            <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+                            <button type="submit" class="btn btn-primary">Gönder</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-8">
+            <div class="container w-full md:w-4/5 xl:w-3/5  mx-auto px-1">
                 <div>
                     <div id='recipients' class="p-8 mt-4 lg:mt-0 rounded shadow bg-white overflow-x-auto">
                         <table id="example" class="stripe hover table-left-align" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
@@ -278,8 +264,7 @@
                     }
                 </div>
             </div>
-            <div class="col-md-8">
-            </div>
+
         </div>
     </div>
 </div>
@@ -349,6 +334,12 @@
         </div>
     </div>
 </div>
+<!-- jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 
 <script>
     // Modal için verileri ayarla
@@ -363,5 +354,31 @@
         document.getElementById('editPhoneNumber').value = phoneNumber;
         document.getElementById('editAddress').value = address;
     }
-
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            responsive: true,
+            language: {
+                "decimal": "",
+                "emptyTable": "Tabloda veri bulunamadı",
+                "info": "_TOTAL_ kayıt içerisinden _START_ - _END_ arası gösteriliyor",
+                "infoEmpty": "Kayıt yok",
+                "infoFiltered": "(_MAX_ kayıt içerisinden filtrelendi)",
+                "lengthMenu": "_MENU_ kayıt göster",
+                "loadingRecords": "Yükleniyor...",
+                "processing": "İşleniyor...",
+                "search": "Ara:",
+                "zeroRecords": "Eşleşen kayıt bulunamadı",
+                "paginate": {
+                    "first": "İlk",
+                    "last": "Son",
+                    "next": "Sonraki",
+                    "previous": "Önceki"
+                },
+                "aria": {
+                    "sortAscending": ": Artan şekilde sırala",
+                    "sortDescending": ": Azalan şekilde sırala"
+                }
+            }
+        });
+    });
 </script>

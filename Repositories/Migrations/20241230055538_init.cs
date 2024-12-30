@@ -274,6 +274,28 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Suggestion = table.Column<string>(type: "text", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    ProductsId = table.Column<int>(type: "int", nullable: true),
+                    RequestCreatorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestCreateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notes_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RequestSuggestions",
                 columns: table => new
                 {
@@ -332,9 +354,9 @@ namespace Repositories.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "061a7b42-0586-449d-ad3c-c3a23fb0dc78", null, "Editor", "EDITOR" },
-                    { "a78b66cf-4ac8-49ae-b14d-f44a457b230d", null, "User", "USER" },
-                    { "ea9adb6d-c81d-4f51-a298-b12dec27ff51", null, "Admin", "ADMIN" }
+                    { "2a40a670-cd08-46a7-9a2c-b51b8f94b6b3", null, "Editor", "EDITOR" },
+                    { "ae3a7876-5288-4030-b4c2-d8ec9bfbc635", null, "Admin", "ADMIN" },
+                    { "c9181f9c-784d-4ddc-9b3e-2587960578e3", null, "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -427,6 +449,11 @@ namespace Repositories.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notes_ProductsId",
+                table: "Notes",
+                column: "ProductsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoriesId",
                 table: "Products",
                 column: "CategoriesId");
@@ -479,6 +506,9 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Notes");
 
             migrationBuilder.DropTable(
                 name: "RequestSuggestions");

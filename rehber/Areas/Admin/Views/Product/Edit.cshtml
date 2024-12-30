@@ -44,13 +44,14 @@
         background-color: #fff;
         background-clip: border-box;
         border: 0 solid rgba(0,0,0,.125);
-        border-radius: .25rem;
+        border-radius: .16rem;
     }
 
     .card-body {
         flex: 1 1 auto;
         min-height: 1px;
         padding: 1rem;
+        font-size: 20px;
     }
 
     .gutters-sm {
@@ -61,6 +62,7 @@
         .gutters-sm > .col, .gutters-sm > [class*=col-] {
             padding-right: 8px;
             padding-left: 8px;
+            width: 30%;
         }
 
     .mb-3, .my-3 {
@@ -79,44 +81,13 @@
         box-shadow: none !important;
     }
 </style>
-<!--
-<form method="post" asp-action="Edit" enctype="multipart/form-data">
+<link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel=" stylesheet">
+<!--Replace with your tailwind.css once created-->
+<!--Regular Datatables CSS-->
+<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+<!--Responsive Extension Datatables CSS-->
+<link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
 
-    <div class="text-danger" asp-validation-summary="All"></div>
-
-    <input type="hidden" asp-for="Id" />
-
-    <div class="form-group my-3">
-        <label asp-for="CategoryId">Meslek</label>
-        <select class="form-control" asp-for="CategoryId">
-
-        </select>
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="Name">İsim</label>
-        <input asp-for="Name" class="form-control" />
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="SurName">Soyisim</label>
-        <input asp-for="SurName" class="form-control" />
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="Address">Adres</label>
-        <input asp-for="Address" class="form-control" />
-    </div>
-
-    <div class="form-group my-3">
-        <label asp-for="PhoneNumber">Telefon Numarası</label>
-        <input asp-for="PhoneNumber" class="form-control" />
-    </div>
-    <div class="form-group my-3">
-        <button class="btn btn-primary" type="submit">Kaydet</button>
-    </div>
-</form>
--->
 <div class="container">
     <div class="main-body">
         <div class="row gutters-sm">
@@ -215,10 +186,25 @@
                         </li>
                     </ul>
                 </div>
+                <!--Suggestions-->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6>Öneriler</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-action="CreateSuggestions">
+                            <div class="mb-3">
+                                <textarea class="form-control" name="Suggestion" rows="3" placeholder="Önerinizi yazınız..."></textarea>
+                            </div>
+                            <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+                            <button type="submit" class="btn btn-primary">Gönder</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-8">
-                <div>
-                    <div id='recipients' class="p-8 mt-4 lg:mt-0 rounded shadow bg-white overflow-x-auto">
+            <div class="container w-full md:w-4/5 xl:w-3/5  mx-auto px-1">
+                <!--Anketler-->
+                <div id='recipients' class="p-8 mt-4 lg:mt-0 rounded shadow bg-white overflow-x-auto">
                         <table id="example" class="stripe hover table-left-align" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
                             <thead>
                                 <tr>
@@ -248,7 +234,7 @@
                         </table>
 
                     </div>
-                </div>
+                <!--Cevaplar-->
                 <div>
                     <hr />
                     @if (Model.LastAnsweredSurvey != null)
@@ -277,9 +263,139 @@
                         <p>Henüz bir anketi cevaplamadınız.</p>
                     }
                 </div>
+
             </div>
-            <div class="col-md-8">
+            <!--Öneriler-->
+            <div id='recipients' class="p-8 mt-4 lg:mt-0 rounded shadow bg-white overflow-x-auto">
+                <table id="example2" class="stripe hover table-left-align" style="width:100%; padding-top: 1em; padding-bottom: 1em;">
+                    <thead>
+                        <tr>
+                            <th data-priority="1" style="text-align: center;">Öneri</th>
+                            <th data-priority="2" style="text-align: center;">Durum</th>
+                            <th data-priority="3" style="text-align: center;">Oluşturan</th>
+                            <th data-priority="4" style="text-align: center;">Oluşturulma Tarihi</th>
+                            <th data-priority="5" style="text-align: center;">Sonlandıran</th>
+                            <th data-priority="6" style="text-align: center;">Sonlandırma Tarihi</th>
+                            <th data-priority="7" style="text-align: center;">Rapor</th>
+                            <th data-priority="8" style="text-align: center;">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var suggestion in Model.RequestSuggestions)
+                        {
+                            <tr>
+                                <td>
+                                    @{
+                                        var shortText = suggestion.Suggestion.Length > 10
+                                        ? suggestion.Suggestion.Substring(0, 10) + "..."
+                                        : suggestion.Suggestion;
+
+                                        var fullText = suggestion.Suggestion; // Tam metin
+                                    }
+
+                                    <span style="cursor: pointer; color: blue;" data-bs-toggle="modal" data-bs-target="#suggestionModal-@suggestion.Id" onclick="event.stopPropagation();">
+                                        @shortText
+                                    </span>
+
+                                    <!-- Modal for Viewing Full Suggestion -->
+                                    <div class="modal fade" id="suggestionModal-@suggestion.Id" tabindex="-1" aria-labelledby="suggestionModalLabel-@suggestion.Id" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="suggestionModalLabel-@suggestion.Id">Öneri Detayı</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body" style="word-wrap: break-word; overflow-wrap: break-word;">
+                                                    @fullText
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    @Html.Raw(suggestion.SuggestionStatus
+                                ? "<i class='fas fa-check-circle' style='color: green;' title='Sonuçlandırıldı'></i>"
+                                : "<i class='fas fa-times-circle' style='color: red;' title='Sonuçlandırılmadı'></i>")
+                                </td>
+                                <td style="text-align: center;">@(string.IsNullOrEmpty(suggestion.RequestCreatorId) ? "Bilinmiyor" : suggestion.RequestCreatorId)</td>
+                                <td style="text-align: center;">@suggestion.RequestCreateTime.ToString("dd-MM-yyyy")</td>
+                                <td style="text-align: center;">@(string.IsNullOrEmpty(suggestion.ReguestTerminatedId) ? "-" : suggestion.ReguestTerminatedId)</td>
+                                <td style="text-align: center;">
+                                    @(suggestion.RequestTerminatTime.HasValue
+                                        ? suggestion.RequestTerminatTime.Value.ToString("dd-MM-yyyy")
+                                        : "-")
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(suggestion.SuggesionReport))
+                                    {
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewReportModal-@suggestion.Id">
+                                            Görüntüle
+                                        </button>
+
+                                        <!-- Modal for Viewing Full Suggestion Report -->
+                                        <div class="modal fade" id="viewReportModal-@suggestion.Id" tabindex="-1" aria-labelledby="viewReportModalLabel-@suggestion.Id" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="viewReportModalLabel-@suggestion.Id">Rapor Detayı</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body" style="word-wrap: break-word; overflow-wrap: break-word;">
+                                                        @suggestion.SuggesionReport
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span>Rapor Yok</span>
+                                    }
+                                </td>
+                                <td>
+                                    <!-- Rapor Ekle/Düzenle Butonu -->
+                                    <button class="btn btn-sm btn-warning" onclick="openReportModal(@suggestion.Id)">
+                                        Ekle/Düzenle
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
+
+            <!-- Report Add/Edit Modal -->
+            <div class="modal fade" id="editReportModal" tabindex="-1" aria-labelledby="editReportModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form id="reportForm" method="post" asp-action="EditSuggestions">
+                        <input type="hidden" id="suggestionId" name="suggestionId" />
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editReportModalLabel">Rapor Ekle/Düzenle</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="reportText" class="form-label">Rapor:</label>
+                                    <textarea class="form-control" id="reportText" name="reportText" rows="4"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
         </div>
     </div>
 </div>
@@ -349,6 +465,12 @@
         </div>
     </div>
 </div>
+<!-- jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
 
 <script>
     // Modal için verileri ayarla
@@ -363,5 +485,94 @@
         document.getElementById('editPhoneNumber').value = phoneNumber;
         document.getElementById('editAddress').value = address;
     }
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            responsive: true,
+            language: {
+                "decimal": "",
+                "emptyTable": "Tabloda veri bulunamadı",
+                "info": "_TOTAL_ kayıt içerisinden _START_ - _END_ arası gösteriliyor",
+                "infoEmpty": "Kayıt yok",
+                "infoFiltered": "(_MAX_ kayıt içerisinden filtrelendi)",
+                "lengthMenu": "_MENU_ kayıt göster",
+                "loadingRecords": "Yükleniyor...",
+                "processing": "İşleniyor...",
+                "search": "Ara:",
+                "zeroRecords": "Eşleşen kayıt bulunamadı",
+                "paginate": {
+                    "first": "İlk",
+                    "last": "Son",
+                    "next": "Sonraki",
+                    "previous": "Önceki"
+                },
+                "aria": {
+                    "sortAscending": ": Artan şekilde sırala",
+                    "sortDescending": ": Azalan şekilde sırala"
+                }
+            }
+        });
+    });
 
+    $(document).ready(function () {
+        var table = $('#example2').DataTable({
+            responsive: true,
+            language: {
+                "decimal": "",
+                "emptyTable": "Tabloda veri bulunamadı",
+                "info": "_TOTAL_ kayıt içerisinden _START_ - _END_ arası gösteriliyor",
+                "infoEmpty": "Kayıt yok",
+                "infoFiltered": "(_MAX_ kayıt içerisinden filtrelendi)",
+                "lengthMenu": "_MENU_ kayıt göster",
+                "loadingRecords": "Yükleniyor...",
+                "processing": "İşleniyor...",
+                "search": "Ara:",
+                "zeroRecords": "Eşleşen kayıt bulunamadı",
+                "paginate": {
+                    "first": "İlk",
+                    "last": "Son",
+                    "next": "Sonraki",
+                    "previous": "Önceki"
+                },
+                "aria": {
+                    "sortAscending": ": Artan şekilde sırala",
+                    "sortDescending": ": Azalan şekilde sırala"
+                }
+            }
+        });
+    });
+
+    function openReportModal(suggestionId) {
+        // Suggestion ID'yi modal'daki hidden input'a yerleştir
+        document.getElementById('suggestionId').value = suggestionId;
+
+        // Modal'ı aç
+        const modal = new bootstrap.Modal(document.getElementById('editReportModal'));
+        modal.show();
+    }
+
+    function submitReport() {
+        const suggestionId = document.getElementById('suggestionId').value;
+        const reportText = document.getElementById('reportText').value;
+
+        fetch(`/Admin/Suggestions/AddReport`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: suggestionId,
+                report: reportText
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Rapor eklendi.");
+                    location.reload();
+                } else {
+                    alert("Bir hata oluştu.");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
 </script>

@@ -12,7 +12,7 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241228101526_init")]
+    [Migration("20241230055538_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -106,6 +106,38 @@ namespace Repositories.Migrations
                             Id = 6,
                             EducationStatusName = "Doktora"
                         });
+                });
+
+            modelBuilder.Entity("Entities.Models.Notes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RequestCreateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequestCreatorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Suggestion")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("Entities.Models.Products", b =>
@@ -526,19 +558,19 @@ namespace Repositories.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a78b66cf-4ac8-49ae-b14d-f44a457b230d",
+                            Id = "c9181f9c-784d-4ddc-9b3e-2587960578e3",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "061a7b42-0586-449d-ad3c-c3a23fb0dc78",
+                            Id = "2a40a670-cd08-46a7-9a2c-b51b8f94b6b3",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         },
                         new
                         {
-                            Id = "ea9adb6d-c81d-4f51-a298-b12dec27ff51",
+                            Id = "ae3a7876-5288-4030-b4c2-d8ec9bfbc635",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -648,6 +680,15 @@ namespace Repositories.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.Models.Notes", b =>
+                {
+                    b.HasOne("Entities.Models.Products", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductsId");
+
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Entities.Models.Products", b =>

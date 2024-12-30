@@ -67,133 +67,133 @@ namespace rehber.Controllers
                 UserLastSurveyStatus = userLastSurveyStatus
             });
         }
-        #region Creat
-        public IActionResult Create()
-        {
-            ViewBag.EducationStatus = _serviceManager.EducationStatus.GetAllEducationStatus(false);
-            ViewBag.Category = _serviceManager.CategoryService.GetAllCategories(false);
-            ViewBag.Referance = _serviceManager.ReferanceService.GetAllReferances(false);
-            return View();
-        }
+        //#region Creat
+        //public IActionResult Create()
+        //{
+        //    ViewBag.EducationStatus = _serviceManager.EducationStatus.GetAllEducationStatus(false);
+        //    ViewBag.Category = _serviceManager.CategoryService.GetAllCategories(false);
+        //    ViewBag.Referance = _serviceManager.ReferanceService.GetAllReferances(false);
+        //    return View();
+        //}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([FromForm] ProductDtoForInsertion productDto, string? NewCategoryName, string? NewReferanceName)
-        {
-            if (!string.IsNullOrEmpty(NewCategoryName))
-            {
-                // Yeni kategoriyi ekle
-                var newCategory = new Categories
-                {
-                    CategoryName = NewCategoryName
-                };
-                _serviceManager.CategoryService.AddCategory(newCategory);
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<ActionResult> Create([FromForm] ProductDtoForInsertion productDto, string? NewCategoryName, string? NewReferanceName)
+        //{
+        //    if (!string.IsNullOrEmpty(NewCategoryName))
+        //    {
+        //        // Yeni kategoriyi ekle
+        //        var newCategory = new Categories
+        //        {
+        //            CategoryName = NewCategoryName
+        //        };
+        //        _serviceManager.CategoryService.AddCategory(newCategory);
 
-                // Yeni kategori ID'sini productDto'ya ata
-                productDto.CategoryId = newCategory.Id;
-            }
-            if (!string.IsNullOrEmpty(NewReferanceName))
-            {
-                // Yeni kategoriyi ekle
-                var newReferance = new Referance
-                {
-                    ReferanceName = NewReferanceName
-                };
-                _serviceManager.ReferanceService.AddReferance(newReferance);
+        //        // Yeni kategori ID'sini productDto'ya ata
+        //        productDto.CategoryId = newCategory.Id;
+        //    }
+        //    if (!string.IsNullOrEmpty(NewReferanceName))
+        //    {
+        //        // Yeni kategoriyi ekle
+        //        var newReferance = new Referance
+        //        {
+        //            ReferanceName = NewReferanceName
+        //        };
+        //        _serviceManager.ReferanceService.AddReferance(newReferance);
 
-                // Yeni kategori ID'sini productDto'ya ata
-                productDto.ReferanceId = newReferance.Id;
-            }
-            _serviceManager.ProductService.CreateProduct(productDto);
-            return RedirectToAction("Index");
+        //        // Yeni kategori ID'sini productDto'ya ata
+        //        productDto.ReferanceId = newReferance.Id;
+        //    }
+        //    _serviceManager.ProductService.CreateProduct(productDto);
+        //    return RedirectToAction("Index");
 
-        }
-        #endregion
+        //}
+        //#endregion
 
-        #region Edit
-        public IActionResult Edit(int Id)
-        {
+        //#region Edit
+        //public IActionResult Edit(int Id)
+        //{
 
-            var categories = _serviceManager.CategoryService.GetAllCategories(false);
-            var product = _serviceManager.ProductService.GetOneProduct(Id,false);
-            var EducationStatus = _serviceManager.EducationStatus.GetAllEducationStatus(false);
-            var Referance = _serviceManager.ReferanceService.GetAllReferances(false);
-            IEnumerable<Survey> Surveys = _serviceManager.SurveyService.GetAllSurveys(false);
+        //    var categories = _serviceManager.CategoryService.GetAllCategories(false);
+        //    var product = _serviceManager.ProductService.GetOneProduct(Id,false);
+        //    var EducationStatus = _serviceManager.EducationStatus.GetAllEducationStatus(false);
+        //    var Referance = _serviceManager.ReferanceService.GetAllReferances(false);
+        //    IEnumerable<Survey> Surveys = _serviceManager.SurveyService.GetAllSurveys(false);
 
-            var answeredSurveyIds = _serviceManager.SurveyResponseService
-                .GetResponsesByUserId(Id)
-                .Select(response => response.Question.SurveyId)
-                .Distinct()
-                .ToHashSet();
+        //    var answeredSurveyIds = _serviceManager.SurveyResponseService
+        //        .GetResponsesByUserId(Id)
+        //        .Select(response => response.Question.SurveyId)
+        //        .Distinct()
+        //        .ToHashSet();
 
-            //// Kullanıcının son cevapladığı anketin soruları ve cevapları
-            //var responses = _serviceManager.SurveyResponseService.GetResponsesByUserId(Id);
+        //    //// Kullanıcının son cevapladığı anketin soruları ve cevapları
+        //    //var responses = _serviceManager.SurveyResponseService.GetResponsesByUserId(Id);
 
-            //// Eğer kullanıcı bir anketi cevaplamışsa, en son cevapladığı anketi bul
-            //var lastAnsweredResponse = responses
-            //    .OrderByDescending(response => response.Id) // ID'yi kullanarak sırala
-            //    .FirstOrDefault(); // En son cevabı al
+        //    //// Eğer kullanıcı bir anketi cevaplamışsa, en son cevapladığı anketi bul
+        //    //var lastAnsweredResponse = responses
+        //    //    .OrderByDescending(response => response.Id) // ID'yi kullanarak sırala
+        //    //    .FirstOrDefault(); // En son cevabı al
 
-            //// Eğer en son cevaplı anket bulunmuşsa
-            //LastSurveyViewModel lastAnsweredSurveyViewModel = null;
+        //    //// Eğer en son cevaplı anket bulunmuşsa
+        //    //LastSurveyViewModel lastAnsweredSurveyViewModel = null;
 
-            //if (lastAnsweredResponse != null)
-            //{
-            //    var lastSurvey = lastAnsweredResponse.Question.Survey;
+        //    //if (lastAnsweredResponse != null)
+        //    //{
+        //    //    var lastSurvey = lastAnsweredResponse.Question.Survey;
 
-            //    // Soruları ve cevapları alıyoruz
-            //    var surveyQuestionsAndResponses = _serviceManager.SurveyQuestionService
-            //        .GetAllSurveyQuestion(false, lastSurvey.Id)
-            //        .Select(question => new QuestionAnswerViewModel
-            //        {
-            //            QuestionText = question.Text,
-            //            Answer = question.Responses != null && question.Responses.Any(r => r.UserId == Id)
-            //                ? question.Responses
-            //                    .Where(r => r.UserId == Id) // Kullanıcının cevabı
-            //                    .Select(r => r.ResponseText)
-            //                    .FirstOrDefault() ?? "Yanıt Verilmedi"
-            //                : "Yanıt Verilmedi"
-            //        }).ToList();
+        //    //    // Soruları ve cevapları alıyoruz
+        //    //    var surveyQuestionsAndResponses = _serviceManager.SurveyQuestionService
+        //    //        .GetAllSurveyQuestion(false, lastSurvey.Id)
+        //    //        .Select(question => new QuestionAnswerViewModel
+        //    //        {
+        //    //            QuestionText = question.Text,
+        //    //            Answer = question.Responses != null && question.Responses.Any(r => r.UserId == Id)
+        //    //                ? question.Responses
+        //    //                    .Where(r => r.UserId == Id) // Kullanıcının cevabı
+        //    //                    .Select(r => r.ResponseText)
+        //    //                    .FirstOrDefault() ?? "Yanıt Verilmedi"
+        //    //                : "Yanıt Verilmedi"
+        //    //        }).ToList();
 
 
-            //    // ViewModel oluşturuyoruz
-            //    lastAnsweredSurveyViewModel = new LastSurveyViewModel
-            //    {
-            //        SurveyId = lastSurvey.Id,
-            //        SurveyTitle = lastSurvey.Title,
-            //        QuestionsAndAnswers = surveyQuestionsAndResponses
-            //    };
-            //}
-            var LastSolvedSurveyId = _serviceManager.SurveyResponseService.LastSolvedSurveyId(product.Id);
-            var responses = _serviceManager.SurveyResponseService.GetResponsesWithSurveyIDByUserId(product.Id, LastSolvedSurveyId);
-            var responseViewModel = responses.Select(response => new QuestionAnswerViewModel
-            {
-                QuestionText = response.Question.Text,
-                Answer = response.ResponseText
-            }).ToList();
+        //    //    // ViewModel oluşturuyoruz
+        //    //    lastAnsweredSurveyViewModel = new LastSurveyViewModel
+        //    //    {
+        //    //        SurveyId = lastSurvey.Id,
+        //    //        SurveyTitle = lastSurvey.Title,
+        //    //        QuestionsAndAnswers = surveyQuestionsAndResponses
+        //    //    };
+        //    //}
+        //    var LastSolvedSurveyId = _serviceManager.SurveyResponseService.LastSolvedSurveyId(product.Id);
+        //    var responses = _serviceManager.SurveyResponseService.GetResponsesWithSurveyIDByUserId(product.Id, LastSolvedSurveyId);
+        //    var responseViewModel = responses.Select(response => new QuestionAnswerViewModel
+        //    {
+        //        QuestionText = response.Question.Text,
+        //        Answer = response.ResponseText
+        //    }).ToList();
 
-            LastSurveyViewModel lastAnsweredSurveyViewModel = null;
-            lastAnsweredSurveyViewModel = new LastSurveyViewModel
-            {
-                SurveyId = LastSolvedSurveyId,
-                SurveyTitle = LastSolvedSurveyId.ToString(),
-                QuestionsAndAnswers = responseViewModel
-            };
+        //    LastSurveyViewModel lastAnsweredSurveyViewModel = null;
+        //    lastAnsweredSurveyViewModel = new LastSurveyViewModel
+        //    {
+        //        SurveyId = LastSolvedSurveyId,
+        //        SurveyTitle = LastSolvedSurveyId.ToString(),
+        //        QuestionsAndAnswers = responseViewModel
+        //    };
 
-            return View(new ProductViewModel()
-            {
-                Product = product,
-                Categories = categories,
-                EducationStatus = EducationStatus,
-                Referance = Referance,
-                Survey = Surveys,
-                AnsweredSurveyIds = answeredSurveyIds,
-                LastAnsweredSurvey = lastAnsweredSurveyViewModel
-            });
+        //    return View(new ProductViewModel()
+        //    {
+        //        Product = product,
+        //        Categories = categories,
+        //        EducationStatus = EducationStatus,
+        //        Referance = Referance,
+        //        Survey = Surveys,
+        //        AnsweredSurveyIds = answeredSurveyIds,
+        //        LastAnsweredSurvey = lastAnsweredSurveyViewModel
+        //    });
 
-        }
+        //}
 
-        #endregion
+        //#endregion
 
         #region Survey Submit
         public IActionResult SolveSurvey(int surveyId, int productId)

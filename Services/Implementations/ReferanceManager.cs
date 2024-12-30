@@ -27,5 +27,10 @@ namespace Services.Implementations
         {
             return _manager.Referance.GetAllReferances(trackChanges);
         }
+
+        public int GetReferanceId(string referanceName)
+        {
+            return _manager.Referance.GetReferanceId(referanceName);
+        }
     }
 }

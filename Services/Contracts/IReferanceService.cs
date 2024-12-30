@@ -11,5 +11,6 @@ namespace Services.Contracts
     {
         IEnumerable<Referance> GetAllReferances(bool trackChanges);
         Task AddReferance(Referance referance);
+        int GetReferanceId(string referanceName);
     }
 }

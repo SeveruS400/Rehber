@@ -14,6 +14,8 @@ namespace rehber.Models
         public IEnumerable<Survey> Survey { get; set; } = Enumerable.Empty<Survey>();
         public HashSet<int> AnsweredSurveyIds { get; set; }
 		public LastSurveyViewModel LastAnsweredSurvey { get; set; }
+        public IEnumerable<RequestSuggestions> RequestSuggestions { get; set; }
+
 
     }
 }

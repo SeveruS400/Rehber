@@ -22,6 +22,7 @@ namespace Repositories
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<SurveyQuestion> SurveyQuestions { get; set; }
         public DbSet<SurveyResponse> SurveyResponses { get; set; }
+        public DbSet<Notes> Notes { get; set; }
         public DbSet<RequestSuggestions> RequestSuggestions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
