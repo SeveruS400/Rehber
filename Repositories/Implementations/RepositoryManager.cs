@@ -16,6 +16,7 @@ namespace Repositories.Implementations
         private readonly ISurveyResponseRepository _surveyResponseRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRequestSuggestionsRepository _requestSuggestionsRepository;
+        private readonly INotesRepository _notesRepository;
 
         public RepositoryManager(DataContext context, 
             IProductRepository productRepository,
@@ -26,7 +27,8 @@ namespace Repositories.Implementations
             ISurveyQuestionRepository surveyQuestionRepository,
             ISurveyResponseRepository surveyResponseRepository,
             IUserRepository userRepository,
-            IRequestSuggestionsRepository requestSuggestionsRepository)
+            IRequestSuggestionsRepository requestSuggestionsRepository,
+            INotesRepository notesRepository)
         {
             _context = context;
             _productRepository = productRepository;
@@ -38,6 +40,7 @@ namespace Repositories.Implementations
             _surveyResponseRepository = surveyResponseRepository;
             _userRepository = userRepository;
             _requestSuggestionsRepository = requestSuggestionsRepository;
+            _notesRepository = notesRepository;
         }
         #endregion
 
@@ -53,6 +56,8 @@ namespace Repositories.Implementations
 
         public IRequestSuggestionsRepository RequestSuggestions => _requestSuggestionsRepository;
 
+        public INotesRepository Notes => _notesRepository;
+
         public DbContext CreateDbContext()
         {
             return _context;
@@ -60,7 +65,17 @@ namespace Repositories.Implementations
 
         public async void Save()
         {
-            _context.SaveChangesAsync();
+            //_context.SaveChangesAsync();
+            try
+            {
+                _context.SaveChanges();  // Burada SaveChanges çağrılıyor.
+            }
+            catch (Exception ex)
+            {
+                // Eğer hata alıyorsanız, burada hata mesajını loglayabilirsiniz.
+                Console.WriteLine($"Error during saving: {ex.Message}");
+                throw;
+            }
         }
 
         DbContext IRepositoryManager.CreateDbContext()

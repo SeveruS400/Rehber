@@ -66,6 +66,7 @@ namespace rehber.Infrastructure.Extensions
             services.AddScoped<ISurveyQuestionRepository, SurveyQuestionRepository>();
             services.AddScoped<ISurveyResponseRepository, SurveyResponseRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<INotesRepository, NotesRepository>();
             services.AddScoped<IRequestSuggestionsRepository, RequestSuggestionsRepository>();
 
         }
@@ -81,6 +82,7 @@ namespace rehber.Infrastructure.Extensions
             services.AddScoped<ISurveyQuestionService, SurveyQuestionManager>();
             services.AddScoped<ISurveyResponseService, SurveyResponseManager>();
             services.AddScoped<IAuthService, AuthManager>();
+            services.AddScoped<INotesService, NotesManager>();
             services.AddScoped<IRequestSuggestionsService, RequestSuggestionsManager>();
         }
 

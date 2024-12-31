@@ -1,5 +1,11 @@
 ﻿@model ProductListViewModel
-
+@if (TempData["Error"] != null)
+{
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		@TempData["Error"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+}
 <!DOCTYPE html>
 <html lang="en" class="antialiased">
 
@@ -45,12 +51,12 @@
 				<thead>
 					<tr>
 						<th data-priority="1">İsim</th>
-						<th data-priority="2">Soyisim</th>
-						<th data-priority="3" style="text-align: center;">Telefon Numarası</th>
-						<th data-priority="4">Mesleği</th>
-						<th data-priority="5">Eğitim Durumu</th>
-						<th data-priority="6">Referans</th>
-						<th data-priority="7">Son Anket Durumu</th>
+						<th data-priority="2" style="text-align: center;">Telefon Numarası</th>
+						<th data-priority="3">Mesleği</th>
+						<th data-priority="4">Eğitim Durumu</th>
+						<th data-priority="5">Referans</th>
+						<th data-priority="6" style="text-align: center;">Son Anket Durumu</th>
+						<th data-priority="7" style="text-align: center;">İletişim Durumu</th>
 
 					</tr>
 				</thead>
@@ -75,22 +81,35 @@
 								<input type="hidden" name="id" value="@product.Id" />
 							</form>
 							<td>@product.Name</td>
-							<td>@product.SurName</td>
 							<td style="text-align: center;">@product.PhoneNumber</td>
 							<td>@categoryName</td>
 							<td>@EducationStatus</td>
 							<td>@ReferanceName</td>
-							<td>
+							<td style="text-align: center;">
 								@if (lastSurveyStatus == "Çözüldü")
 								{
 									<span class="text-success">
-										<i class="fa-solid fa-check"></i> @lastSurveyStatus
+										<i class="fa-solid fa-check"></i>
 									</span>
 								}
 								else
 								{
 									<span class="text-danger">
-										<i class="fa-solid fa-x"></i> @lastSurveyStatus
+										<i class="fa-solid fa-x"></i>
+									</span>
+								}
+							</td>
+							<td style="text-align: center;">
+								@if (product.ConnStatus == true)
+								{
+									<span class="text-success">
+										<i class="fa-solid fa-check"></i>
+									</span>
+								}
+								else
+								{
+									<span class="text-danger">
+										<i class="fa-solid fa-x"></i>
 									</span>
 								}
 							</td>

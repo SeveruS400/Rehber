@@ -15,6 +15,7 @@ namespace rehber.Models
         public HashSet<int> AnsweredSurveyIds { get; set; }
 		public LastSurveyViewModel LastAnsweredSurvey { get; set; }
         public IEnumerable<RequestSuggestions> RequestSuggestions { get; set; }
+        public Notes Notes { get; set; }
 
 
     }

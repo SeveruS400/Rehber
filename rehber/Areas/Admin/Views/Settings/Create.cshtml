@@ -6,14 +6,19 @@
     ViewData["Title"] = "Yeni Kişi Ekle";
 }
 @{
-
     var UserName = UserManager.GetUserName(User);
-
-
+    var url = "/";
 }
+@if (TempData["returnUrl"] != null)
+{
+    url = TempData["returnUrl"].ToString();
+}
+
+
 <h2>Yeni Kişi Ekle</h2>
 
 <form asp-action="Create" method="post">
+    <input type="hidden" name="returnUrl" value="@url" />
     <input type="hidden" asp-for="AddedByUserName" value="@UserName" />
     <div class="form-group">
         <label asp-for="UserName">Kullanıcı Adı</label>

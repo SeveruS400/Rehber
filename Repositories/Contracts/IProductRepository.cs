@@ -14,8 +14,10 @@ namespace Repositories.Contracts
         IEnumerable<Products> GetAllProductsWithDetails(ProductRequestParameters p);
         IEnumerable<Products> GetShowCaseProducts(bool trackChanges);
         Products GetOneProduct(int id, bool trackChanges);
+        Products GetOneProductAsync(int id, bool trackChanges);
         Task CreateProduct(Products product);
         Task UpdateProduct(Products entity);
         void SaveProducts(List<Products> products);
+        void UpdateProducts(List<Products> products);
     }
 }

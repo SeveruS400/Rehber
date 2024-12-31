@@ -52,6 +52,17 @@ namespace Repositories.Implementations
             _context.Products.AddRange(products);
             _context.SaveChanges();
         }
+        public void UpdateProducts(List<Products> products)
+        {
+            _context.Products.UpdateRange(products);
+            _context.SaveChanges();
+        }
+
+        public Products GetOneProductAsync(int id, bool trackChanges)
+        {
+            var product = _context.Products.FirstOrDefault(u => u.Id == id);
+            return product;
+        }
 
     }
 }

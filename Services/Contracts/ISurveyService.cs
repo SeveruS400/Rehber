@@ -17,6 +17,7 @@ namespace Services.Contracts
         void UpdateSurvey(Survey Survey);
         void UpdateSurveyEditTime(int Id, string userName);
         int LatestSurveyId();
+        Task GenerateUniqueLinkAsync(SurveyLink surveyLink);
 
     }
 }

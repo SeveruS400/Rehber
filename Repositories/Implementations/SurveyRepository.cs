@@ -31,5 +31,25 @@ namespace Repositories.Implementations
             var Surveys  = _context.Surveys.Include(s => s.Questions).FirstOrDefault(u => u.Id == Id);
 			return Surveys;
         }
+        public void GenerateUniqueLink(SurveyLink surveyLink)
+        {
+            _context.Add(surveyLink); 
+            _context.SaveChanges();
+        }
+        public async Task<SurveyLink> GetSurveyLink(int surveyId, string token)
+        {
+            var surveyLink = await _context.SurveyLinks
+                               .Include(sl => sl.Survey)
+                               .ThenInclude(s => s.Questions)
+                               .FirstOrDefaultAsync(sl => sl.SurveyId == surveyId && sl.UniqueLink == token && !sl.IsUsed);
+
+            if (surveyLink == null)
+            {
+                return null;
+            }
+
+            return surveyLink;
+        }
+
     }
 }

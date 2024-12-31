@@ -2,6 +2,7 @@
 using Entities.Dtos;
 using Entities.Models;
 using Entities.RequestParameters;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contracts;
 using Services.Contracts;
 
@@ -56,9 +57,17 @@ namespace Services.Implementations
                 .Take(n);
         }
 
-        public Products? GetOneProduct(int id, bool trackChanges)
+        public Products GetOneProduct(int id, bool trackChanges)
         {
             var product = _manager.Product.GetOneProduct(id, trackChanges);
+            if (product is null)
+                throw new Exception("Product not found!");
+            return product;
+        }
+
+        public async Task<Products> GetOneProductAsync(int id, bool trackChanges)
+        {
+            var product =  _manager.Product.GetOneProductAsync(id, trackChanges);
             if (product is null)
                 throw new Exception("Product not found!");
             return product;
@@ -83,23 +92,34 @@ namespace Services.Implementations
             return products;
         }
 
-        public void SaveProducts(List<Products> products)
+		public async Task ResetAllConnStatus()
+		{
+			var allProducts = _manager.Product.GetAllProducts(false).ToList();
+            foreach (var product in allProducts)
+            {
+                product.ConnStatus = false;
+            }
+            _manager.Product.UpdateProducts(allProducts);
+		}
+
+		public void SaveProducts(List<Products> products)
         {
             _manager.Product.SaveProducts(products);
         }
 
         public void UpdateProduct(ProductDtoForUpdate productDto)
         {
-            var entity =  _manager.Product.GetOneProduct(productDto.Id, true);
-            entity.Id = productDto.Id;
-            entity.Name = productDto.Name;
-            entity.SurName = productDto.SurName;
-            entity.Address = productDto.Address;
-            entity.PhoneNumber = productDto.PhoneNumber;
-            entity.CategoryId = productDto.CategoryId;
-			entity.EducationStatusId = productDto.EducationStatusId;
-            entity.ReferanceId = productDto.ReferanceId;
+			var entity =  _manager.Product.GetOneProduct(productDto.Id, false);
+			//         entity.Id = productDto.Id;
+			//         entity.Name = productDto.Name;
+			//         entity.SurName = productDto.SurName;
+			//         entity.Address = productDto.Address;
+			//         entity.PhoneNumber = productDto.PhoneNumber;
+			//         entity.CategoryId = productDto.CategoryId;
+			//entity.EducationStatusId = productDto.EducationStatusId;
+			//         entity.ReferanceId = productDto.ReferanceId;
 
+			_mapper.Map(productDto, entity);
 
 			_manager.Save();
         }

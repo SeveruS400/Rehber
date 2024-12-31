@@ -14,9 +14,6 @@ namespace Entities.Dtos
 
         [Required(ErrorMessage = "Name is required")]
         public String Name { get; set; }
-
-        [Required(ErrorMessage = "SurName is required")]
-        public String SurName { get; set; }
         public String? Address { get; set; } = String.Empty;
         public int? ReferanceId { get; set; }
         public int? EducationStatusId { get; set; }

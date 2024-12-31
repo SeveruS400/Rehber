@@ -28,8 +28,10 @@ namespace Services.Implementations
             var result = await _userManager.CreateAsync(user, userDto.Password);
 
             if (!result.Succeeded)
-                throw new Exception("User could not be created.");
-
+            {
+                return null;
+            }
+                
             if (userDto.Roles.Count > 0)
             {
                 var roleResult = await _userManager.AddToRolesAsync(user, userDto.Roles);
@@ -120,6 +122,8 @@ namespace Services.Implementations
             var user = _userManager.FindByNameAsync(userName).Result;
             return _userManager.GetRolesAsync(user).Result;
         }
+
+
 
     }
 }

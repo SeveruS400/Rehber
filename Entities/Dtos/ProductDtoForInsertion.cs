@@ -8,5 +8,6 @@ namespace Entities.Dtos
 {
     public record ProductDtoForInsertion : ProductsDto
     {
+        public bool ConnStatus { get; set; }
     }
 }

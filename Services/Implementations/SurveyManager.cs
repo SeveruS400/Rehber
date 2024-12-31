@@ -21,7 +21,7 @@ namespace Services.Implementations
         }
         public async Task AddSurvey(Survey survey)
         {
-            _manager.Survey.AddSurvey(survey);
+            await _manager.Survey.AddSurvey(survey);
         }
 
         public async Task DeleteSurvey(int Id)
@@ -30,6 +30,11 @@ namespace Services.Implementations
                .Survey
 			   .DeleteAsync(Id);
             _manager.Save();
+        }
+
+        public async Task GenerateUniqueLinkAsync(SurveyLink surveyLink)
+        {
+            _manager.Survey.GenerateUniqueLink(surveyLink);
         }
 
         public IEnumerable<Survey> GetAllSurveys(bool trackChanges)

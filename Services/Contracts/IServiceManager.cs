@@ -18,5 +18,6 @@ namespace Services.Contracts
         ISurveyResponseService SurveyResponseService { get; }
         IAuthService AuthService { get; }
         IRequestSuggestionsService RequestSuggestionsService { get; }
+        INotesService NotesService { get; }
     }
 }

@@ -12,7 +12,7 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241230055538_init")]
+    [Migration("20241231082036_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -157,6 +157,9 @@ namespace Repositories.Migrations
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("ConnStatus")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("EducationStatusId")
                         .HasColumnType("int");
 
@@ -174,10 +177,6 @@ namespace Repositories.Migrations
                     b.Property<bool>("ShowCase")
                         .HasColumnType("bit");
 
-                    b.Property<string>("SurName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriesId");
@@ -194,84 +193,84 @@ namespace Repositories.Migrations
                             Id = 1,
                             Address = "Address",
                             CategoryId = 1,
+                            ConnStatus = false,
                             EducationStatusId = 1,
                             Name = "Ahmet",
                             PhoneNumber = "05061111111",
                             ReferanceId = 1,
-                            ShowCase = false,
-                            SurName = "Ahmet"
+                            ShowCase = false
                         },
                         new
                         {
                             Id = 2,
                             Address = "Address",
                             CategoryId = 1,
+                            ConnStatus = false,
                             EducationStatusId = 1,
                             Name = "Mehmet",
                             PhoneNumber = "05061111111",
                             ReferanceId = 2,
-                            ShowCase = false,
-                            SurName = "Mehmet"
+                            ShowCase = false
                         },
                         new
                         {
                             Id = 3,
                             Address = "Address",
                             CategoryId = 2,
+                            ConnStatus = false,
                             EducationStatusId = 2,
                             Name = "Celal",
                             PhoneNumber = "05061111111",
                             ReferanceId = 3,
-                            ShowCase = false,
-                            SurName = "Celal"
+                            ShowCase = false
                         },
                         new
                         {
                             Id = 4,
                             Address = "Address",
                             CategoryId = 2,
+                            ConnStatus = false,
                             EducationStatusId = 3,
                             Name = "İsa",
                             PhoneNumber = "05061111111",
                             ReferanceId = 4,
-                            ShowCase = false,
-                            SurName = "Celal"
+                            ShowCase = false
                         },
                         new
                         {
                             Id = 5,
                             Address = "Address",
                             CategoryId = 3,
+                            ConnStatus = false,
                             EducationStatusId = 4,
                             Name = "Musa",
                             PhoneNumber = "05061111111",
                             ReferanceId = 5,
-                            ShowCase = true,
-                            SurName = "Celal"
+                            ShowCase = true
                         },
                         new
                         {
                             Id = 6,
                             Address = "Address",
                             CategoryId = 3,
+                            ConnStatus = false,
                             EducationStatusId = 5,
                             Name = "Batu",
                             PhoneNumber = "05061111111",
                             ReferanceId = 6,
-                            ShowCase = true,
-                            SurName = "Celal"
+                            ShowCase = true
                         },
                         new
                         {
                             Id = 7,
                             Address = "Address",
                             CategoryId = 3,
+                            ConnStatus = false,
                             EducationStatusId = 6,
                             Name = "Akif",
                             PhoneNumber = "05061111111",
                             ReferanceId = 2,
-                            ShowCase = true,
-                            SurName = "Celal"
+                            ShowCase = true
                         });
                 });
 
@@ -401,6 +400,36 @@ namespace Repositories.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Surveys");
+                });
+
+            modelBuilder.Entity("Entities.Models.SurveyLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SurveyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UniqueLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SurveyLinks");
                 });
 
             modelBuilder.Entity("Entities.Models.SurveyQuestion", b =>
@@ -558,19 +587,19 @@ namespace Repositories.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c9181f9c-784d-4ddc-9b3e-2587960578e3",
+                            Id = "727ce7b0-5c79-47aa-a9c5-38dda7b528a6",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "2a40a670-cd08-46a7-9a2c-b51b8f94b6b3",
+                            Id = "e7224582-9924-44e7-84dd-b9765b645466",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         },
                         new
                         {
-                            Id = "ae3a7876-5288-4030-b4c2-d8ec9bfbc635",
+                            Id = "d63bbb1e-eaca-446e-a539-c77a29dce64c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -723,6 +752,25 @@ namespace Repositories.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("Products");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Entities.Models.SurveyLink", b =>
+                {
+                    b.HasOne("Entities.Models.Survey", "Survey")
+                        .WithMany()
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Models.Products", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
 
                     b.Navigation("User");
                 });

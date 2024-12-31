@@ -1,9 +1,11 @@
-﻿using Entities.Dtos;
+﻿using AutoMapper;
+using Entities.Dtos;
 using Entities.Models;
 using Entities.RequestParameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using rehber.Models;
 using Services.Contracts;
@@ -17,9 +19,11 @@ namespace rehber.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IServiceManager _serviceManager;
-        public ProductController(IServiceManager serviceManager)
+		private readonly IMapper _mapper;
+		public ProductController(IServiceManager serviceManager,IMapper mapper)
         {
             _serviceManager = serviceManager;
+            _mapper = mapper;
         }
         public IActionResult Index(ProductRequestParameters p)
         {
@@ -30,6 +34,7 @@ namespace rehber.Areas.Admin.Controllers
 
             var LastSurveyId = _serviceManager.SurveyService.LatestSurveyId();
             var userLastSurveyStatus = new Dictionary<int, bool>();
+
             if (LastSurveyId != 0)
             {
 
@@ -50,7 +55,6 @@ namespace rehber.Areas.Admin.Controllers
                     {
                         userLastSurveyStatus[product.Id] = false;
                     }
-
 
                 }
             }
@@ -108,6 +112,7 @@ namespace rehber.Areas.Admin.Controllers
                 // Yeni kategori ID'sini productDto'ya ata
                 productDto.ReferanceId = newReferance.Id;
             }
+            productDto.ConnStatus = false;
             _serviceManager.ProductService.CreateProduct(productDto);
             return RedirectToAction("Index");
 
@@ -145,7 +150,7 @@ namespace rehber.Areas.Admin.Controllers
                 SurveyTitle = LastSolvedSurveyId.ToString(),
                 QuestionsAndAnswers = responseViewModel
             };
-
+            var lastNote = _serviceManager.NotesService.GetLastNoteByUserId(product.Id);
             var requestSuggestions = _serviceManager.RequestSuggestionsService.GetAllRequestSuggestionsByProductId(product.Id);
             return View(new ProductViewModel()
             {
@@ -156,7 +161,8 @@ namespace rehber.Areas.Admin.Controllers
                 Survey = Surveys,
                 AnsweredSurveyIds = answeredSurveyIds,
                 LastAnsweredSurvey = lastAnsweredSurveyViewModel,
-                RequestSuggestions = requestSuggestions
+                RequestSuggestions = requestSuggestions,
+                Notes = lastNote
             });
 
         }
@@ -226,7 +232,32 @@ namespace rehber.Areas.Admin.Controllers
             TempData["Success"] = "Öneriniz başarıyla kaydedildi!";
             return RedirectToAction("Index"); // Geri döneceğiniz sayfa
         }
+        [HttpPost]
+        public IActionResult CreateNote(Notes note)
+        {
+            if (string.IsNullOrWhiteSpace(note.Suggestion))
+            {
+                // Öneri boşsa hata mesajı
+                TempData["Error"] = "Not metni boş olamaz.";
+                return RedirectToAction("Index"); 
+            }
 
+            note.RequestCreateTime = DateTime.Now; 
+            note.RequestCreatorId = User.Identity.Name;
+
+			var product = _serviceManager.ProductService.GetOneProduct(note.ProductId,false);
+			if (product != null)
+			{
+				product.ConnStatus = true;
+				var productDto = _mapper.Map<ProductDtoForUpdate>(product);
+				_serviceManager.ProductService.UpdateProduct(productDto);
+			}
+
+			_serviceManager.NotesService.AddNotes(note);
+            TempData["Success"] = "Öneriniz başarıyla kaydedildi!";
+            return RedirectToAction("Index"); 
+        }
+        
         [HttpPost]
         public IActionResult EditSuggestions(int suggestionId, string reportText)
         {
@@ -261,87 +292,95 @@ namespace rehber.Areas.Admin.Controllers
                         var product = new Products
                         {
                             Name = worksheet.Cells[row, 1].Text,
-                            SurName = worksheet.Cells[row, 2].Text,
-                            Address = worksheet.Cells[row, 3].Text,
-                            PhoneNumber = worksheet.Cells[row, 6].Text,
+                            Address = worksheet.Cells[row, 2].Text,
+                            PhoneNumber = worksheet.Cells[row, 5].Text,
                             ShowCase = true,
+                            ConnStatus = false
                         };
-
-                        var categoryName = worksheet.Cells[row, 7].Text; // Kategori adı
-                        if (!string.IsNullOrEmpty(categoryName))
+                        var phoneNumberIsAvabilable = product.PhoneNumber;
+                        var existingProduct = _serviceManager.ProductService.GetAllProducts(false)
+                        .FirstOrDefault(p => p.PhoneNumber == phoneNumberIsAvabilable);
+                        if (existingProduct == null)
                         {
-                            var category = _serviceManager.CategoryService.GetAllCategories(false).FirstOrDefault(c => c.CategoryName == categoryName);
-                            if (category == null)
+                            var categoryName = worksheet.Cells[row, 6].Text; // Kategori adı
+                            if (!string.IsNullOrEmpty(categoryName))
                             {
-                                
-                                // Yeni kategori ekle
-                                category = new Categories { CategoryName = categoryName };
-                                _serviceManager.CategoryService.AddCategory(category);
-                                var categoryId = _serviceManager.CategoryService.GetCategoryId(categoryName);
-                                product.CategoryId = categoryId;
+                                var category = _serviceManager.CategoryService.GetAllCategories(false).FirstOrDefault(c => c.CategoryName == categoryName);
+                                if (category == null)
+                                {
+                                    category = new Categories { CategoryName = categoryName };
+                                    _serviceManager.CategoryService.AddCategory(category);
+                                    var categoryId = _serviceManager.CategoryService.GetCategoryId(categoryName);
+                                    product.CategoryId = categoryId;
+                                }
+                                else
+                                {
+                                    product.CategoryId = category.Id;
+                                }
+
                             }
-                            else
+
+                            var referanceName = worksheet.Cells[row, 3].Text;
+                            if (!string.IsNullOrEmpty(referanceName))
                             {
-                                product.CategoryId = category.Id;
+                                var referance = _serviceManager.ReferanceService.GetAllReferances(false).FirstOrDefault(c => c.ReferanceName == referanceName);
+                                if (referance == null)
+                                {
+
+                                    // Yeni kategori ekle
+                                    referance = new Referance { ReferanceName = referanceName };
+                                    _serviceManager.ReferanceService.AddReferance(referance);
+                                    var referanceId = _serviceManager.CategoryService.GetCategoryId(categoryName);
+                                    product.ReferanceId = referanceId;
+                                }
+                                else
+                                {
+                                    product.ReferanceId = referance.Id;
+                                }
                             }
-                            
+
+                            var educationStatusName = worksheet.Cells[row, 4].Text.ToLower(); // Gelen değer küçük harfe çevir
+                            int? educationStatusId = null;
+                            if (!string.IsNullOrEmpty(educationStatusName))
+                            {
+                                // Eğitim durumu eşlemesi
+                                switch (educationStatusName)
+                                {
+                                    case "ilkokul":
+                                        educationStatusId = 1; // İlkokul ID'si
+                                        break;
+                                    case "ortaokul":
+                                        educationStatusId = 2; // Ortaokul ID'si
+                                        break;
+                                    case "lise":
+                                        educationStatusId = 3; // Lise ID'si
+                                        break;
+                                    case "üniversite":
+                                        educationStatusId = 4; // Ortaokul ID'si
+                                        break;
+                                    case "yüksek lisans":
+                                        educationStatusId = 5; // Lise ID'si
+                                        break;
+                                    case "doktora":
+                                        educationStatusId = 6; // Lise ID'si
+                                        break;
+                                    default:
+                                        educationStatusId = -1;
+                                        break;
+                                }
+                                product.EducationStatusId = educationStatusId;
+                            }
+                            if (!string.IsNullOrEmpty(product.Name) && !string.IsNullOrEmpty(product.PhoneNumber))
+                            {
+                                products.Add(product);
+                            }
                         }
-
-                        var referanceName = worksheet.Cells[row, 4].Text;
-                        if (!string.IsNullOrEmpty(referanceName))
+                        else
                         {
-                            var referance = _serviceManager.ReferanceService.GetAllReferances(false).FirstOrDefault( c => c.ReferanceName == referanceName);
-                            if (referance == null)
-                            {
-
-                                // Yeni kategori ekle
-                                referance = new Referance { ReferanceName = referanceName };
-                                _serviceManager.ReferanceService.AddReferance(referance);
-                                var referanceId = _serviceManager.CategoryService.GetCategoryId(categoryName);
-                                product.ReferanceId = referanceId;
-                            }
-                            else
-                            {
-                                product.ReferanceId = referance.Id;
-                            }
-
+                            Console.WriteLine($"Bu telefon numarası zaten kayıtlı.");
+                            continue;
                         }
-
-                        var educationStatusName = worksheet.Cells[row, 5].Text.ToLower(); // Gelen değer küçük harfe çevir
-                        int? educationStatusId = null;
-                        if (!string.IsNullOrEmpty(educationStatusName))
-                        {
-                            // Eğitim durumu eşlemesi
-                            switch (educationStatusName)
-                            {
-                                case "ilkokul":
-                                    educationStatusId = 1; // İlkokul ID'si
-                                    break;
-                                case "ortaokul":
-                                    educationStatusId = 2; // Ortaokul ID'si
-                                    break;
-                                case "lise":
-                                    educationStatusId = 3; // Lise ID'si
-                                    break;
-                                case "üniversite":
-                                    educationStatusId = 4; // Ortaokul ID'si
-                                    break;
-                                case "yüksek lisans":
-                                    educationStatusId = 5; // Lise ID'si
-                                    break;
-                                case "doktora":
-                                    educationStatusId = 6; // Lise ID'si
-                                    break;
-                                default:
-                                    educationStatusId = -1;
-                                    break;
-                            }
-                            product.EducationStatusId = educationStatusId;
-                        }
-                        if (!string.IsNullOrEmpty(product.Name) && !string.IsNullOrEmpty(product.SurName) && !string.IsNullOrEmpty(product.PhoneNumber))
-                        {
-							products.Add(product);
-						}
+                        
                     }
                 }
             }

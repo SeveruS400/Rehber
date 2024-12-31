@@ -223,14 +223,14 @@ namespace Repositories.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SurName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReferanceId = table.Column<int>(type: "int", nullable: true),
                     EducationStatusId = table.Column<int>(type: "int", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ShowCase = table.Column<bool>(type: "bit", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
-                    CategoriesId = table.Column<int>(type: "int", nullable: true)
+                    CategoriesId = table.Column<int>(type: "int", nullable: true),
+                    ConnStatus = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -328,6 +328,34 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SurveyLinks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SurveyId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UniqueLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SurveyLinks_Products_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SurveyLinks_Surveys_SurveyId",
+                        column: x => x.SurveyId,
+                        principalTable: "Surveys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SurveyResponses",
                 columns: table => new
                 {
@@ -354,9 +382,9 @@ namespace Repositories.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "2a40a670-cd08-46a7-9a2c-b51b8f94b6b3", null, "Editor", "EDITOR" },
-                    { "ae3a7876-5288-4030-b4c2-d8ec9bfbc635", null, "Admin", "ADMIN" },
-                    { "c9181f9c-784d-4ddc-9b3e-2587960578e3", null, "User", "USER" }
+                    { "727ce7b0-5c79-47aa-a9c5-38dda7b528a6", null, "User", "USER" },
+                    { "d63bbb1e-eaca-446e-a539-c77a29dce64c", null, "Admin", "ADMIN" },
+                    { "e7224582-9924-44e7-84dd-b9765b645466", null, "Editor", "EDITOR" }
                 });
 
             migrationBuilder.InsertData(
@@ -397,16 +425,16 @@ namespace Repositories.Migrations
 
             migrationBuilder.InsertData(
                 table: "Products",
-                columns: new[] { "Id", "Address", "CategoriesId", "CategoryId", "EducationStatusId", "Name", "PhoneNumber", "ReferanceId", "ShowCase", "SurName" },
+                columns: new[] { "Id", "Address", "CategoriesId", "CategoryId", "ConnStatus", "EducationStatusId", "Name", "PhoneNumber", "ReferanceId", "ShowCase" },
                 values: new object[,]
                 {
-                    { 1, "Address", null, 1, 1, "Ahmet", "05061111111", 1, false, "Ahmet" },
-                    { 2, "Address", null, 1, 1, "Mehmet", "05061111111", 2, false, "Mehmet" },
-                    { 3, "Address", null, 2, 2, "Celal", "05061111111", 3, false, "Celal" },
-                    { 4, "Address", null, 2, 3, "İsa", "05061111111", 4, false, "Celal" },
-                    { 5, "Address", null, 3, 4, "Musa", "05061111111", 5, true, "Celal" },
-                    { 6, "Address", null, 3, 5, "Batu", "05061111111", 6, true, "Celal" },
-                    { 7, "Address", null, 3, 6, "Akif", "05061111111", 2, true, "Celal" }
+                    { 1, "Address", null, 1, false, 1, "Ahmet", "05061111111", 1, false },
+                    { 2, "Address", null, 1, false, 1, "Mehmet", "05061111111", 2, false },
+                    { 3, "Address", null, 2, false, 2, "Celal", "05061111111", 3, false },
+                    { 4, "Address", null, 2, false, 3, "İsa", "05061111111", 4, false },
+                    { 5, "Address", null, 3, false, 4, "Musa", "05061111111", 5, true },
+                    { 6, "Address", null, 3, false, 5, "Batu", "05061111111", 6, true },
+                    { 7, "Address", null, 3, false, 6, "Akif", "05061111111", 2, true }
                 });
 
             migrationBuilder.CreateIndex(
@@ -479,6 +507,16 @@ namespace Repositories.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SurveyLinks_SurveyId",
+                table: "SurveyLinks",
+                column: "SurveyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SurveyLinks_UserId",
+                table: "SurveyLinks",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SurveyQuestions_SurveyId",
                 table: "SurveyQuestions",
                 column: "SurveyId");
@@ -512,6 +550,9 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "RequestSuggestions");
+
+            migrationBuilder.DropTable(
+                name: "SurveyLinks");
 
             migrationBuilder.DropTable(
                 name: "SurveyResponses");

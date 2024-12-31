@@ -29,9 +29,6 @@ namespace Repositories.Implementations
             {
                 return category.Id;
             }
-
-            // Kategori bulunamadıysa, uygun bir değer döndür
-            // Örneğin -1 ya da null döndürebilirsiniz, ihtiyaçlarınıza göre
             return -1;
         }
         public IEnumerable<Categories> GetAllCategories(bool trackChanges)

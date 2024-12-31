@@ -102,7 +102,7 @@
                                     <h6 class="mb-0">İsim</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    @Model.Product.Name @Model.Product.SurName
+                                    @Model.Product.Name 
                                 </div>
                             </div>
                             <hr>
@@ -156,7 +156,6 @@
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
                                             onclick="setEditModalData(@Model.Product.Id,
                                                 '@Model.Product.Name',
-                                                '@Model.Product.SurName',
                                                 @Model.Product.EducationStatusId),
                                                 '@Model.Product.Address',
                                                 @Model.Product.CategoryId,
@@ -285,10 +284,6 @@
                     <div class="mb-3">
                         <label for="editName" class="form-label">İsim</label>
                         <input type="text" class="form-control" id="editName" name="Name" value="@Model.Product.Name" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editSurName" class="form-label">Soyisim</label>
-                        <input type="text" class="form-control" id="editSurName" name="SurName" value="@Model.Product.SurName" />
                     </div>
                     <div class="mb-3">
                         <label for="editPhoneNumber" class="form-label">Telefon</label>

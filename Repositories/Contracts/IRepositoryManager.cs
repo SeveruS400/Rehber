@@ -14,6 +14,7 @@ namespace Repositories.Contracts
         ISurveyResponseRepository SurveyResponse { get; }
         IUserRepository UserRepository { get; }
         IRequestSuggestionsRepository RequestSuggestions { get; }
+        INotesRepository Notes { get; }
         void Save();
         DbContext CreateDbContext();
     }

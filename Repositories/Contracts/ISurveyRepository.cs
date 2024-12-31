@@ -13,5 +13,7 @@ namespace Repositories.Contracts
         Task AddSurvey(Survey survey);
         IEnumerable<Survey> GetAllSurveys(bool trackChanges);
         Survey GetSurveyById(bool trackChanges, int Id);
+        void GenerateUniqueLink(SurveyLink surveyLink);
+        Task<SurveyLink> GetSurveyLink(int surveyId, string token);
     }
 }

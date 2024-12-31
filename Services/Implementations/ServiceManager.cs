@@ -14,6 +14,7 @@ namespace Services.Implementations
         private readonly ISurveyResponseService _surveyResponseService;
         private readonly IAuthService _authService;
         private readonly IRequestSuggestionsService _requestSuggestionsService;
+        private readonly INotesService _notesService;
 
         public ServiceManager(IProductService productService, 
             ICategoryService categoryService,
@@ -23,7 +24,8 @@ namespace Services.Implementations
             ISurveyQuestionService surveyQuestionService,
             ISurveyResponseService surveyResponseService,
             IAuthService authService,
-            IRequestSuggestionsService requestSuggestionsService)
+            IRequestSuggestionsService requestSuggestionsService,
+            INotesService notesService)
         {
             _productService = productService;
             _categoryService = categoryService;
@@ -34,6 +36,7 @@ namespace Services.Implementations
             _surveyResponseService = surveyResponseService;
             _authService = authService;
             _requestSuggestionsService = requestSuggestionsService;
+            _notesService = notesService;
         }
 
         public IProductService ProductService => _productService;
@@ -49,5 +52,7 @@ namespace Services.Implementations
         public IAuthService AuthService => _authService;
 
         public IRequestSuggestionsService RequestSuggestionsService => _requestSuggestionsService;
+
+        public INotesService NotesService => _notesService;
     }
 }

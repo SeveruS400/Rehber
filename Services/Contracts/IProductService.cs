@@ -11,10 +11,13 @@ namespace Services.Contracts
         IEnumerable<Products> GetAllProductsWithDetails(ProductRequestParameters p);
         IEnumerable<Products> GetShowCaseProducts(bool trackChanges);
         Products? GetOneProduct(int id, bool trackChanges);
+        Task<Products> GetOneProductAsync(int id, bool trackChanges);
         void CreateProduct(ProductDtoForInsertion productDto);
         void UpdateProduct(ProductDtoForUpdate productDto);
         void DeleteProduct(int id);
         ProductDtoForUpdate GetOneProductForUpdate(int id, bool trackChanges);
         void SaveProducts(List<Products> products);
-    }
+        Task ResetAllConnStatus();
+
+	}
 }

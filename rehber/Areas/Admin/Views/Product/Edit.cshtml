@@ -9,6 +9,13 @@
         .FirstOrDefault(c => c.Id == @Model.Product.ReferanceId)?.ReferanceName ?? "N/A";
 
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <style>
     body {
         margin-top: 20px;
@@ -102,7 +109,7 @@
                                     <h6 class="mb-0">İsim</h6>
                                 </div>
                                 <div class="col-sm-9 text-secondary">
-                                    @Model.Product.Name @Model.Product.SurName
+                                    @Model.Product.Name
                                 </div>
                             </div>
                             <hr>
@@ -152,11 +159,27 @@
                             </div>
                             <hr>
                             <div class="row">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0">Görüşme Notu</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    @if (string.IsNullOrEmpty(Model.Notes?.Suggestion))
+                                    {
+                                        <span>Kayıt bulunamadı</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@Model.Notes.Suggestion</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <hr />
+                            <div class="row">
                                 <div class="col-sm-12">
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
                                             onclick="setEditModalData(@Model.Product.Id,
                                                 '@Model.Product.Name',
-                                                '@Model.Product.SurName',
                                                 @Model.Product.EducationStatusId),
                                                 '@Model.Product.Address',
                                                 @Model.Product.CategoryId,
@@ -189,14 +212,24 @@
                 <!--Suggestions-->
                 <div class="card mt-3">
                     <div class="card-header">
-                        <h6>Öneriler</h6>
+                        <h6>Öneri/Sorun/Görüşme Notu</h6>
                     </div>
                     <div class="card-body">
-                        <form method="post" asp-action="CreateSuggestions">
+                        <form id="suggestionForm" method="post">
                             <div class="mb-3">
                                 <textarea class="form-control" name="Suggestion" rows="3" placeholder="Önerinizi yazınız..."></textarea>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="suggestionType">Öneri türünü seçin:</label><br />
+                                <input type="radio" id="suggestion" name="suggestionType" value="Suggestion" checked />
+                                <label for="suggestion">Öneri/Sorun</label>
+                                <input type="radio" id="note" name="suggestionType" value="Note" />
+                                <label for="note">Görüşme Notu</label>
+                            </div>
+
                             <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+
                             <button type="submit" class="btn btn-primary">Gönder</button>
                         </form>
                     </div>
@@ -263,7 +296,6 @@
                         <p>Henüz bir anketi cevaplamadınız.</p>
                     }
                 </div>
-
             </div>
             <!--Öneriler-->
             <div id='recipients' class="p-8 mt-4 lg:mt-0 rounded shadow bg-white overflow-x-auto">
@@ -394,8 +426,6 @@
                     </form>
                 </div>
             </div>
-
-
         </div>
     </div>
 </div>
@@ -416,10 +446,6 @@
                     <div class="mb-3">
                         <label for="editName" class="form-label">İsim</label>
                         <input type="text" class="form-control" id="editName" name="Name" value="@Model.Product.Name" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editSurName" class="form-label">Soyisim</label>
-                        <input type="text" class="form-control" id="editSurName" name="SurName" value="@Model.Product.SurName" />
                     </div>
                     <div class="mb-3">
                         <label for="editPhoneNumber" class="form-label">Telefon</label>
@@ -575,4 +601,25 @@
             })
             .catch(error => console.error('Error:', error));
     }
+
+    // Formun gönderileceği aksiyonu dinamik olarak değiştirmek için JavaScript
+    document.getElementById('suggestionForm').addEventListener('submit', function (e) {
+        e.preventDefault();  // Varsayılan form gönderimini engelle
+
+        // Radyo butonu ile seçilen değeri kontrol et
+        var suggestionType = document.querySelector('input[name="suggestionType"]:checked').value;
+
+        // Formu doğru aksiyona yönlendir
+        if (suggestionType === 'Suggestion') {
+            // Öneri seçildi, CreateSuggestions aksiyonuna yönlendir
+            this.action = '@Url.Action("CreateSuggestions", "Product")'; // ControllerName'i doğru şekilde değiştirin
+        } else if (suggestionType === 'Note') {
+            // Not seçildi, CreateNote aksiyonuna yönlendir
+            this.action = '@Url.Action("CreateNote", "Product")'; // ControllerName'i doğru şekilde değiştirin
+        }
+
+        // Formu gönder
+        this.submit();
+    });
+
 </script>

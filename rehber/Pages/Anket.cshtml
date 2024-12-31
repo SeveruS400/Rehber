@@ -1,0 +1,384 @@
+﻿@page "/anket/{surveyId}/{token}"
+@model rehber.Pages.AnketModel
+
+<style>
+     :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f6f8ff 0%, #e9ecfc 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(120deg, var(--primary) 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            position: relative;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--gray-900);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 2px solid transparent;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        .rating-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .rating-btn {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .rating-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .rating-btn.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .yes-no-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .yes-no-btn {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 120px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .yes-no-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .yes-no-btn.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 2rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary) 0%, #6366f1 100%);
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+</style>
+@if (Model.IsValidLink)
+{
+@*     <form method="post">
+        @foreach (var question in Model.Survey.Questions)
+        {
+            <div>
+                <label>@question.Text</label>
+                <input type="text" name="response_@question.Id" />
+            </div>
+        }
+        <button type="submit">Cevapla</button>
+    </form> *@
+    <body>
+        <div class="container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <form id="feedbackForm" class="form-card">
+                <h1>@Model.Survey.Title</h1>
+
+                <!-- Personal Information -->
+                <div class="section">
+                    <h2 class="section-title">Personal Information</h2>
+                    <div class="form-group">
+                        <label>Name (Optional)</label>
+                        <input type="text" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select>
+                            <option value="">Select department</option>
+                            <option>Engineering</option>
+                            <option>Marketing</option>
+                            <option>Sales</option>
+                            <option>HR</option>
+                            <option>Finance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <input type="text" placeholder="Your current position">
+                    </div>
+                    <div class="form-group">
+                        <label>Length of time with the company (years)</label>
+                        <input type="number" min="0" step="0.5" placeholder="e.g., 2.5">
+                    </div>
+                </div>
+
+                <!-- Work Environment -->
+                <div class="section">
+                    <h2 class="section-title">Work Environment & Culture</h2>
+                    <div class="form-group">
+                        <label>How satisfied are you with your work environment?</label>
+                        <div class="rating-group" data-rating>
+                            <button type="button" class="rating-btn" data-value="1">1</button>
+                            <button type="button" class="rating-btn" data-value="2">2</button>
+                            <button type="button" class="rating-btn" data-value="3">3</button>
+                            <button type="button" class="rating-btn" data-value="4">4</button>
+                            <button type="button" class="rating-btn" data-value="5">5</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Do you feel safe and respected at work?</label>
+                        <div class="yes-no-group" data-yesno>
+                            <button type="button" class="yes-no-btn" data-value="yes">Yes</button>
+                            <button type="button" class="yes-no-btn" data-value="no">No</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Satisfaction -->
+                <div class="section">
+                    <h2 class="section-title">Role Satisfaction</h2>
+                    <div class="form-group">
+                        <label>How satisfied are you with your current role?</label>
+                        <div class="rating-group" data-rating>
+                            <button type="button" class="rating-btn" data-value="1">1</button>
+                            <button type="button" class="rating-btn" data-value="2">2</button>
+                            <button type="button" class="rating-btn" data-value="3">3</button>
+                            <button type="button" class="rating-btn" data-value="4">4</button>
+                            <button type="button" class="rating-btn" data-value="5">5</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>What do you enjoy most about your role?</label>
+                        <textarea rows="3" placeholder="Share your thoughts..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Management -->
+                <div class="section">
+                    <h2 class="section-title">Management & Leadership</h2>
+                    <div class="form-group">
+                        <label>How satisfied are you with management support?</label>
+                        <div class="rating-group" data-rating>
+                            <button type="button" class="rating-btn" data-value="1">1</button>
+                            <button type="button" class="rating-btn" data-value="2">2</button>
+                            <button type="button" class="rating-btn" data-value="3">3</button>
+                            <button type="button" class="rating-btn" data-value="4">4</button>
+                            <button type="button" class="rating-btn" data-value="5">5</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Does management listen to your feedback?</label>
+                        <div class="yes-no-group" data-yesno>
+                            <button type="button" class="yes-no-btn" data-value="yes">Yes</button>
+                            <button type="button" class="yes-no-btn" data-value="no">No</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Follow Up -->
+                <div class="section">
+                    <h2 class="section-title">Follow-up Permission</h2>
+                    <div class="form-group">
+                        <label>Would you be open to discussing your feedback with HR?</label>
+                        <div class="yes-no-group" data-yesno>
+                            <button type="button" class="yes-no-btn" data-value="yes">Yes</button>
+                            <button type="button" class="yes-no-btn" data-value="no">No</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Feedback</button>
+            </form>
+        </div>
+    </body>
+}
+else
+{
+    <h1>Bu link geçersiz veya daha önce kullanılmış.</h1>
+}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+            // Handle rating buttons
+            const ratingGroups = document.querySelectorAll('[data-rating]');
+            ratingGroups.forEach(group => {
+                const buttons = group.querySelectorAll('.rating-btn');
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        buttons.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                    });
+                });
+            });
+
+            // Handle yes/no buttons
+            const yesNoGroups = document.querySelectorAll('[data-yesno]');
+            yesNoGroups.forEach(group => {
+                const buttons = group.querySelectorAll('.yes-no-btn');
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        buttons.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                    });
+                });
+            });
+
+            // Handle form submission
+            const form = document.getElementById('feedbackForm');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Thank you for your feedback!');
+            });
+
+            // Update progress bar
+            const inputs = form.querySelectorAll('input, select, textarea');
+            const progressBar = document.getElementById('progress');
+            
+            const updateProgress = () => {
+                const total = inputs.length;
+                const filled = Array.from(inputs).filter(input => input.value.trim() !== '').length;
+                const progress = (filled / total) * 100;
+                progressBar.style.width = `${progress}%`;
+            };
+
+            inputs.forEach(input => {
+                input.addEventListener('input', updateProgress);
+            });
+        });
+</script>

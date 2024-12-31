@@ -15,13 +15,15 @@ namespace rehber.Areas.Admin.Controllers
     {
         private readonly UserManager<Users> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<Users> _signInManager;
         private readonly IServiceManager _serviceManager;
 
-        public SettingsController(UserManager<Users> userManager, RoleManager<IdentityRole> roleManager, IServiceManager serviceManager)
+        public SettingsController(UserManager<Users> userManager, RoleManager<IdentityRole> roleManager, IServiceManager serviceManager, SignInManager<Users> signInManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _serviceManager = serviceManager;
+            _signInManager = signInManager;
         }
 
         public async Task<IActionResult> Index()
@@ -31,7 +33,7 @@ namespace rehber.Areas.Admin.Controllers
             return View(user);
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(int sessionTimeout)
+        public async Task<IActionResult> Edit(int sessionTimeout, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -49,21 +51,22 @@ namespace rehber.Areas.Admin.Controllers
                     if (result.Succeeded)
                     {
                         TempData["SuccessMessage"] = "Session timeout updated successfully!";
-                        return RedirectToAction("Index"); // Geri yönlendirme
+                        return Redirect(returnUrl);
                     }
                     else
                     {
                         // Hata durumunda hata mesajı gösterilir
-                        TempData["ErrorMessage"] = "There was an error updating the session timeout.";
+                        TempData["ErrorMessage"] = "Oturum Zamanı Güncellenemedi";
+                        return Redirect(returnUrl);
                     }
                 }
             }
 
-            return RedirectToAction("Index"); // Eğer model geçerli değilse formu tekrar render ederiz
+            return Redirect(returnUrl); // Eğer model geçerli değilse formu tekrar render ederiz
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(string returnUrl)
         {
             // Kullanıcıyı oluşturan kullanıcının rolünü al
             var currentUserRoles = _serviceManager.AuthService.GetCurrentUserRoles(User.Identity.Name);
@@ -82,23 +85,56 @@ namespace rehber.Areas.Admin.Controllers
                 availableRoles.Add("Editor");
                 availableRoles.Add("User");
             }
-
+            TempData["returnUrl"] = returnUrl;
             return View(new UserDtoForCreation()
             {
                 Roles = availableRoles
             });
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromForm] UserDtoForCreation userDto)
+        public async Task<IActionResult> Create([FromForm] UserDtoForCreation userDto, string returnUrl)
         {
             var result = await _serviceManager.AuthService.CreateUser(userDto);
-            return result.Succeeded
-                ? RedirectToAction("Index")
-                : View();
+            if (result == null || !result.Succeeded)
+            {
+                TempData["Error"] = "Kullanıcı Oluşturulamadı. Kullanıcı adı/Mail kullanımda";
+                return Redirect(returnUrl);
+            }
+            return Redirect(returnUrl);
 
+        }
+
+		//[HttpPost]
+		//public IActionResult ResetConnStatus()
+		//{
+		//	_serviceManager.ProductService.ResetAllConnStatus(); // Servis metodu çağrılır
+		//	TempData["Success"] = "Tüm ürünlerin bağlantı durumu sıfırlandı.";
+		//	return RedirectToAction("Index","Product"); // Ayarlar sayfasına yönlendirin
+		//}
+        [HttpPost]
+        public async Task<IActionResult> VerifyPasswordAndReset(string password, string returnUrl)
+        {
+            // Şu anki oturum açmış kullanıcıyı alın
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["Error"] = "Kullanıcı bulunamadı.";
+                return Redirect(returnUrl);
+            }
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = "Şifre hatalı. Bağlantı durumları sıfırlanmadı.";
+                return Redirect(returnUrl);
+            }
+
+            // Eğer şifre doğruysa bağlantı durumlarını sıfırlayın
+            _serviceManager.ProductService.ResetAllConnStatus();
+
+            TempData["Success"] = "Tüm bağlantı durumları başarıyla sıfırlandı.";
+            return Redirect(returnUrl);
         }
     }
 }
